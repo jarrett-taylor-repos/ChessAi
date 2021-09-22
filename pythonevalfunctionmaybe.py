@@ -41,7 +41,10 @@ def evalpos(boardd):
         elif result == "0-1":
             return -1000
         else:
-            return 0
+            if boardd.turn==chess.WHITE:
+                return -100
+            else:
+                return 100
     else: # materialadvantagecalc(boardd.pop().fen()) != materialadvantagecal(boardd.fen()):
         return materialadvantagecalc(boardd.fen())
     
