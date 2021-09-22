@@ -1,5 +1,5 @@
 import chess
-
+import chess.pgn
 board1 = chess.Board()
 #print(board1.fen())
 
@@ -9,7 +9,7 @@ def materialadvantagecalc(FEN):
     materialadvantage=0
     for i in range(len(FEN)):
         FENpos = FEN[i]
-        if FENpos == 'w':
+        if FENpos == ' ':
             break
         if FENpos == 'p':
             materialadvantage += -1
@@ -45,29 +45,66 @@ def evalpos(boardd):
     else: # materialadvantagecalc(boardd.pop().fen()) != materialadvantagecal(boardd.fen()):
         return materialadvantagecalc(boardd.fen())
     
-def findbestmovenumberarray(boardd):
+def findsinglebestmove(boardd,depth,currentdepth=0):
     legalmoves = list(boardd.legal_moves)
     bestmovenumberarray = []
-    #print(legalmoves)
-    #print(board1)
-    print(legalmoves[0])
-    print(type(boardd))
-    #boardd.push(legalmoves[0])
+    for i in range(len(legalmoves)):
+        tempboard = chess.Board(boardd.fen())
+        tempboard.push(legalmoves[i])
+        if depth==currentdepth:
+            bestmovenumberarray.append(evalpos(tempboard))
+        else:
+            if tempboard.is_game_over() == True:
+                bestmovenumberarray.append(evalpos(tempboard))
+            else:
+                bestmovenumberarray.append(findsinglebestmove(tempboard,depth,currentdepth+1))
+
+        #if currentdepth==0:
+            #print(i)
+            #print(len(legalmoves))
+    
+    
+    if currentdepth == 0:
+        if boardd.turn==chess.WHITE:
+            besteval = (max(bestmovenumberarray))
+        else:
+            besteval = (min(bestmovenumberarray))
+        return legalmoves[bestmovenumberarray.index(besteval)]
+    else:
+        if boardd.turn==chess.WHITE:
+            return max(bestmovenumberarray)
+        else:
+            return min(bestmovenumberarray)
 
 
 
 
-#print(materialadvantagecalc("rnbqkbnr/ppp1pppp/8/8/8/8/PPPPPPPP/1NBQKBNR w Kkq - 0 1"))
 
-#print(board1.legal_moves)
-#print(list(board1.legal_moves)[0])
-legalmoves = list(board1.legal_moves)
-#print(legalmoves)
-#print(board1)
-#print(legalmoves[0])
 
-#print(board1)
-findbestmovenumberarray(board1)
 
-board1.push(legalmoves[0])
-print(type(board1))
+
+
+
+
+board2 = chess.Board("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+board3 = chess.Board("r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 4")
+#print(board3.is_game_over())
+####print(findsinglebestmove(board3,3))
+
+#print(findbestmove(board1,0))
+
+board4 = chess.Board("rn1q1rk1/1p2bppp/p2pbn2/4p3/4P3/1NN1BP2/PPPQ2PP/2KR1B1R b - - 4 10")
+board4 = chess.Board()
+game = chess.pgn.Game()
+game.setup(board4)
+node = game
+while board4.is_game_over()==False:
+    bestmove = (findsinglebestmove(board4,2))
+    node = node.add_variation(bestmove)
+    board4.push(bestmove)
+    print('')
+    print(game)
+
+print('#######################')
+print('DONE')
+print(game)
