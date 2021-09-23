@@ -34,13 +34,18 @@ def materialadvantagecalc(FEN):
     return materialadvantage
 
 def evalpos(boardd):
-    if boardd.outcome() != None:
+    if boardd.is_game_over():
         result = boardd.outcome().result()
+        print(boardd)
+        print('ahh')
+        print(result)
         if result == "1-0":
             return 1000
         elif result == "0-1":
             return -1000
         else:
+            print(boardd.outcome())
+            print('AHHHHHHHHHHHHHHHHHHHHHHHHHHH')
             if boardd.turn==chess.WHITE:
                 return -100
             else:
@@ -57,8 +62,10 @@ def findsinglebestmove(boardd,depth,currentdepth=0):
         if depth==currentdepth:
             bestmovenumberarray.append(evalpos(tempboard))
         else:
-            if tempboard.is_game_over() == True:
+            if tempboard.is_game_over():
                 bestmovenumberarray.append(evalpos(tempboard))
+                print('HERE')
+                print(bestmovenumberarray)
             else:
                 bestmovenumberarray.append(findsinglebestmove(tempboard,depth,currentdepth+1))
 
@@ -72,6 +79,8 @@ def findsinglebestmove(boardd,depth,currentdepth=0):
             besteval = (max(bestmovenumberarray))
         else:
             besteval = (min(bestmovenumberarray))
+        print(bestmovenumberarray)
+        print(boardd.legal_moves)
         return legalmoves[bestmovenumberarray.index(besteval)]
     else:
         if boardd.turn==chess.WHITE:
@@ -101,13 +110,20 @@ board4 = chess.Board()
 game = chess.pgn.Game()
 game.setup(board4)
 node = game
+
+
 while board4.is_game_over()==False:
     bestmove = (findsinglebestmove(board4,2))
     node = node.add_variation(bestmove)
     board4.push(bestmove)
     print('')
     print(game)
+    print('')
 
+print(board4.outcome())
+print(board4.is_game_over())
+print(board4.outcome().termination)
+print(board4.outcome().result())
 print('#######################')
 print('DONE')
 print(game)
