@@ -15,7 +15,7 @@ def materialadvantagecalc(FEN):
             break
         if FENpos == 'p':
             materialadvantage += -1
-        if FENpos == 'k':
+        if FENpos == 'n':
             materialadvantage += -3
         if FENpos == 'b':
             materialadvantage += -3
@@ -25,7 +25,7 @@ def materialadvantagecalc(FEN):
             materialadvantage += -9
         if FENpos == 'P':
             materialadvantage += 1
-        if FENpos == 'K':
+        if FENpos == 'N':
             materialadvantage += 3
         if FENpos == 'B':
             materialadvantage += 3
@@ -43,6 +43,7 @@ def evalpos(boardd):
         elif result == "0-1":
             return -1000
         else:
+            return 0
             if boardd.turn==chess.WHITE:
                 return -100
             else:
@@ -53,8 +54,9 @@ def evalpos(boardd):
 def findsinglebestmove(boardd,depth,currentdepth=0):
     legalmoves = list(boardd.legal_moves)
     bestmovenumberarray = []
+    tempboard = deepcopy(boardd)
     for i in range(len(legalmoves)):
-        tempboard = deepcopy(boardd)
+
         tempboard.push(legalmoves[i])
         if depth==currentdepth:
             bestmovenumberarray.append(evalpos(tempboard))
@@ -63,16 +65,15 @@ def findsinglebestmove(boardd,depth,currentdepth=0):
                 bestmovenumberarray.append(evalpos(tempboard))
             else:
                 bestmovenumberarray.append(findsinglebestmove(tempboard,depth,currentdepth+1))
+        tempboard.pop()
     
     if currentdepth == 0:
-
         if boardd.turn==chess.WHITE:
             besteval = (max(bestmovenumberarray))
         else:
             besteval = (min(bestmovenumberarray))
         return legalmoves[bestmovenumberarray.index(besteval)]
     else:
-
         if boardd.turn==chess.WHITE:
             return max(bestmovenumberarray)
         else:
@@ -103,7 +104,7 @@ node = game
 
 
 while board4.is_game_over()==False:
-    bestmove = (findsinglebestmove(board4,2))
+    bestmove = (findsinglebestmove(board4,3))
     node = node.add_variation(bestmove)
     board4.push(bestmove)
     print('')
