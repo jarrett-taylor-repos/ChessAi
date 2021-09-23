@@ -2,9 +2,10 @@ import chess
 import chess.pgn
 import io
 from copy import deepcopy
+import random
 board1 = chess.Board()
 #print(board1.fen())
-
+log = open('log.txt','w')
 
 
 def materialadvantagecalc(FEN):
@@ -33,15 +34,20 @@ def materialadvantagecalc(FEN):
             materialadvantage += 5
         if FENpos == 'Q':
             materialadvantage += 9
+    #print('calculated material advantage of ', FEN, 'as', materialadvantage,file=log)
     return materialadvantage
 
 def evalpos(boardd):
+    #print('evaluating postion',boardd.move_stack,file=log)
+    global totalevals
+    totalevals = totalevals+1
     if boardd.is_game_over():
         result = boardd.outcome().result()
+        print('found position results in game over', file=log)
         if result == "1-0":
-            return 1000
+            return 100000000
         elif result == "0-1":
-            return -1000
+            return -100000000
         else:
             return 0
             if boardd.turn==chess.WHITE:
@@ -51,20 +57,55 @@ def evalpos(boardd):
     else: # materialadvantagecalc(boardd.pop().fen()) != materialadvantagecal(boardd.fen()):
         return materialadvantagecalc(boardd.fen())
     
-def findsinglebestmove(boardd,depth,currentdepth=0):
+def findsinglebestmove(boardd,depth,currentdepth=0,minormaxofabove=None):
     legalmoves = list(boardd.legal_moves)
     bestmovenumberarray = []
     tempboard = deepcopy(boardd)
-    for i in range(len(legalmoves)):
+    minormaxofthis = None
 
+    ##logging
+    print("entering new depth: ",currentdepth,"minormaxofabove=",minormaxofabove,file=log)
+
+    for i in range(len(legalmoves)):
+        
         tempboard.push(legalmoves[i])
+        
+        #logging
+        movestack = tempboard.move_stack
+        print("testing tempboard: ",movestack[len(movestack)-currentdepth-1:len(movestack)],file=log)
+
         if depth==currentdepth:
-            bestmovenumberarray.append(evalpos(tempboard))
+            
+            evalofmove = (evalpos(tempboard))
+            print('at depth, found evaluation:',evalofmove,file=log)
         else:
             if tempboard.is_game_over():
-                bestmovenumberarray.append(evalpos(tempboard))
+                evalofmove = (evalpos(tempboard))
+                print('found game is over, eval:',evalofmove,file=log)
             else:
-                bestmovenumberarray.append(findsinglebestmove(tempboard,depth,currentdepth+1))
+                evalofmove = (findsinglebestmove(tempboard,depth,currentdepth+1,minormaxofthis))
+                print('EXITING LEVEL, eval:',evalofmove,file=log)
+        bestmovenumberarray.append(evalofmove)
+        print("turn: ",tempboard.ply(),"bestmovenumberarray now:",bestmovenumberarray,"for moves",legalmoves,file=log)
+
+        ##NOT SURE ABOUT THIS PART
+        if tempboard.turn==chess.BLACK:
+            minormaxofthis = max(bestmovenumberarray)
+            print("taking max to find minormaxofthis",file=log)
+            if minormaxofabove!=None:
+                if evalofmove > minormaxofabove:
+                    l=True
+                    print('exiting loop because eval of ',evalofmove,"is greater than",minormaxofabove,file=log)
+                    return evalofmove
+        else:
+            minormaxofthis = min(bestmovenumberarray)
+            print('taking min to find minormaxofthis',file=log)
+            if minormaxofabove!=None:
+                if evalofmove < minormaxofabove:
+                    l=True
+                    print('exiting loop because eval of ',evalofmove,"is less than",minormaxofabove,file=log)
+                    return evalofmove
+        print('',file=log)
         tempboard.pop()
     
     if currentdepth == 0:
@@ -72,7 +113,14 @@ def findsinglebestmove(boardd,depth,currentdepth=0):
             besteval = (max(bestmovenumberarray))
         else:
             besteval = (min(bestmovenumberarray))
-        return legalmoves[bestmovenumberarray.index(besteval)]
+        #return legalmoves[bestmovenumberarray.index(besteval)]
+        
+        #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
+        locationsofbest = bestmovenumberarray.index(besteval)
+        print('found best moves at:',locationsofbest,"with eval:",besteval,file=log)
+        print("SENDING MOVE:", legalmoves[locationsofbest],file=log)
+        return(legalmoves[locationsofbest])
+        return legalmoves[locationsofbest[random.randint(0,len(locationsofbest)-1)]]
     else:
         if boardd.turn==chess.WHITE:
             return max(bestmovenumberarray)
@@ -104,10 +152,13 @@ node = game
 
 
 while board4.is_game_over()==False:
-    bestmove = (findsinglebestmove(board4,3))
+    
+    totalevals = 0
+    bestmove = (findsinglebestmove(board4,2))
     node = node.add_variation(bestmove)
     board4.push(bestmove)
     print('')
+    print(totalevals)
     print(game)
     print('')
 
