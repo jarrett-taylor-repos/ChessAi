@@ -1,5 +1,6 @@
 import chess
 import chess.pgn
+import io
 board1 = chess.Board()
 #print(board1.fen())
 
@@ -112,7 +113,7 @@ game.setup(board4)
 node = game
 
 
-while board4.is_game_over()==False:
+'''while board4.is_game_over()==False:
     bestmove = (findsinglebestmove(board4,2))
     node = node.add_variation(bestmove)
     board4.push(bestmove)
@@ -120,10 +121,22 @@ while board4.is_game_over()==False:
     print(game)
     print('')
 
+
+
 print(board4.outcome())
 print(board4.is_game_over())
 print(board4.outcome().termination)
 print(board4.outcome().result())
 print('#######################')
 print('DONE')
-print(game)
+print(game)'''
+
+pgn = io.StringIO("1. Nh3 Nh6 2. Ng5 Ng4 3. Nxh7 Rxh7 4. Rg1 Nxh2 5. Rh1 Nf3+ 6. gxf3 Rxh1 7. Nc3 Nc6 8. Nd5 Rb8 9. Nxe7 Bxe7 10. Rb1 Kf8 11. Ra1 Kg8 12. Rb1 Kh8 13. Ra1 Kg8 14. Rb1 Kh8 15. Ra1 Kg8 16. Rb1 Kh8 17. Ra1 Kg8 18. Rb1 Kh8 19. Ra1 Kg8 *")
+game = chess.pgn.read_game(pgn)
+#print(game.end().board())
+board = game.end().board()
+board.pop()
+print(board)
+board.push_uci("h8g8")
+print(board.is_game_over())
+print(board)
