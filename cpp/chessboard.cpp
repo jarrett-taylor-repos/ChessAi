@@ -187,11 +187,15 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
         
 
         //need top check if move is promotion
-
-        //check if move is en passant 
+        bool isPawnPromotion = false;
+        //check if move is en passant or promotion
         bool isEnPassant = false;
         Square* removeEnpassant;
         if(start->getColor() == WHITE && (start->getPiece() == PAWN)) {
+            if(end->gety() == 0) {
+                isPawnPromotion = true;
+            }
+
             //cout << "white and pawn move" << endl;
             pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
             Square* lastbeginmove = getSquare(lastmove.first);
@@ -219,6 +223,10 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
 
         }
         if(start->getColor() == BLACK && (start->getPiece() == PAWN)) {
+            if(end->gety() == 7) {
+                isPawnPromotion = true;
+            }
+
             //cout << "black and pawn move" << endl;
             pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
             Square* lastbeginmove = getSquare(lastmove.first);
@@ -295,6 +303,9 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
             end->setPieceandColor(start->getPiece(), start->getColor());
             start->setEmpty();
             removeEnpassant->setEmpty();
+        } else if (isPawnPromotion) {
+            end->setPieceandColor(QUEEN, start->getColor());
+            start->setEmpty();
         }
         else {
             end->setPieceandColor(start->getPiece(), start->getColor());
