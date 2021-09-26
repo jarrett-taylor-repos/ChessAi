@@ -183,10 +183,68 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
     Square* end = getSquare(strend);
     bool rightColorMove = (getColorfromTurn() == start->getColor());
     if(canMakeMove(start, end) && rightColorMove) { //check would go here?
-        moves[turnNum] = make_pair(strstart, strend);
-        turnNum++;
-
         //en passant same as castling in here to check move space?
+        
+
+        //need top check if move is promotion
+
+        //check if move is en passant 
+        bool isEnPassant = false;
+        Square* removeEnpassant;
+        if(start->getColor() == WHITE && (start->getPiece() == PAWN)) {
+            //cout << "white and pawn move" << endl;
+            pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
+            Square* lastbeginmove = getSquare(lastmove.first);
+            Square* lastendmove = getSquare(lastmove.second);
+            bool is_correct_rank = (start->gety() == 3);
+            bool is_pawn_move = (lastendmove->getPiece() == PAWN);
+            bool is_double_move = (abs(lastbeginmove->gety() - start->gety()) == 2) && (abs(lastendmove->getx() - start->getx()) == 1);
+
+            //cout << "correct rank, prev pawn move, prev double pawn: " << is_correct_rank << ", " << is_pawn_move << ", " << is_double_move << endl;
+
+            if(is_pawn_move && is_double_move && is_correct_rank) { //is white enpassant
+                int value = lastendmove->getx() - start->getx();
+                int tempx = start->getx()+value;
+                int tempy = start->gety()-1;
+                pair<int, int> temp = make_pair(tempx, tempy);
+                //cout << "en passant move x, y: " << temp.first << ", " << temp.second << endl;
+                //cout << "end x, y: " << end->getx() << ", " << end->gety() << endl;
+                if(temp.first == end->getx() && temp.second == end->gety()) {
+                    //cout << "is white enpassant" << endl;
+                    lastendmove->setEmpty();
+                    isEnPassant = true;
+                    removeEnpassant = getSquare(lastmove.second);
+                }
+            }
+
+        }
+        if(start->getColor() == BLACK && (start->getPiece() == PAWN)) {
+            //cout << "black and pawn move" << endl;
+            pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
+            Square* lastbeginmove = getSquare(lastmove.first);
+            Square* lastendmove = getSquare(lastmove.second);
+            bool is_correct_rank = (start->gety() == 4);
+            bool is_pawn_move = (lastendmove->getPiece() == PAWN);
+            bool is_double_move = (abs(lastbeginmove->gety() - start->gety()) == 2) && (abs(lastendmove->getx() - start->getx()) == 1);
+
+            //cout << "correct rank, prev pawn move, prev double pawn: " << is_correct_rank << ", " << is_pawn_move << ", " << is_double_move << endl;
+
+            if(is_pawn_move && is_double_move && is_correct_rank) { //is white enpassant
+                int value = lastendmove->getx() - start->getx();
+                int tempx = start->getx()+value;
+                int tempy = start->gety()+1;
+                pair<int, int> temp = make_pair(tempx, tempy);
+                //cout << "en passant move x, y: " << temp.first << ", " << temp.second << endl;
+                //cout << "end x, y: " << end->getx() << ", " << end->gety() << endl;
+                if(temp.first == end->getx() && temp.second == end->gety()) {
+                    //cout << "is black enpassant" << endl;
+                    //lastendmove->setEmpty();
+                    isEnPassant = true;
+                    removeEnpassant = getSquare(lastmove.second);
+                }
+            }
+        }
+
         bool isMoveCastling = (strstart == e1 && strend == g1) ||
             (strstart == e1 && strend == c1) ||
             (strstart == e8 && strend == c8) ||
@@ -233,10 +291,19 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
                 square_e8->setEmpty();
                 square_h8->setEmpty();
             }
-        } else {
+        } else if (isEnPassant) {
+            end->setPieceandColor(start->getPiece(), start->getColor());
+            start->setEmpty();
+            removeEnpassant->setEmpty();
+        }
+        else {
             end->setPieceandColor(start->getPiece(), start->getColor());
             start->setEmpty();
         }
+        
+        moves[turnNum] = make_pair(strstart, strend);
+        turnNum++;
+
         if(turnColor==1) {
             setTurnColor(0);
         } else {
@@ -407,7 +474,7 @@ pair<int, int> ChessBoard::movetHelper(int tempx, int tempy, Square* sq) {
     return p;
 }
 
-vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant
+vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, promotion
     //cout << "getPawns" << endl;
     vector<pair<int, int>> pawns;
     int x = pawn->getx();
@@ -445,6 +512,23 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant
             }
 
         }
+        //en passant
+        //check if rank is correct
+        //check is last move was square one to left or right and in bound
+        //if last move was next to, if square is pawn and pawn moved 2 square, add diagonal capture
+        if(pawn->gety() == 3) { //correct rank for enpassant
+            pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
+            Square* beginmove = getSquare(lastmove.first);
+            Square* endmove = getSquare(lastmove.second);
+            bool is_pawn_move = (endmove->getPiece() == PAWN);
+            bool is_double_move = (abs(beginmove->gety() - y) == 2) && (abs(endmove->getx() - x) == 1);
+            if(is_pawn_move && is_double_move) {
+                int value = endmove->getx() - x;
+                pawns.push_back(make_pair(x+value, y-1));
+            }
+
+
+        }
         
     } else {
         capture.push_back(make_pair(-1, 1));
@@ -471,6 +555,20 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant
                 temp = make_pair(x, y+2);
                 pawns.push_back(temp);
             }
+
+        }
+
+        if(pawn->gety() == 4) { //correct rank for enpassant
+            pair<stringSquare, stringSquare> lastmove = moves[turnNum-1];
+            Square* beginmove = getSquare(lastmove.first);
+            Square* endmove = getSquare(lastmove.second);
+            bool is_pawn_move = (endmove->getPiece() == PAWN);
+            bool is_double_move = (abs(beginmove->gety() - y) == 2) && (abs(endmove->getx() - x) == 1);
+            if(is_pawn_move && is_double_move) {
+                int value = endmove->getx() - x;
+                pawns.push_back(make_pair(x+value, y+1));
+            }
+
 
         }
     }
