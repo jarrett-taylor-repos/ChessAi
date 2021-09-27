@@ -23,6 +23,9 @@ class ChessBoard {
 
 
         void makeMove(stringSquare strstart, stringSquare strend);
+        vector<pair<stringSquare, stringSquare>> getAllMoves();
+        vector<pair<int, int>> returnPieceMoves(Square* piece);
+
 
         bool canMakeMove(Square* start, Square* end);
         bool canKingMove(Square* start, Square* end);
@@ -55,6 +58,7 @@ class ChessBoard {
 
         Square* getSquare(stringSquare strsq);
         Square* getSquare(int x, int y);
+        stringSquare getStringSquare(int x, int y);
 };
 
 //constructors
@@ -327,6 +331,69 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
     }
 }
 
+//get moves 
+vector<pair<stringSquare, stringSquare>> ChessBoard::getAllMoves() {
+    vector<pair<stringSquare, stringSquare>> all_moves;
+
+    //cout << "turnColor " << turnColor << endl;
+    for(int i = 0; i < 8; i++) {
+        for(int j = 0; j < 8; j++) {
+            Square* testsq = getSquare(j, i);
+            if(testsq->getPiece() != EMPTY && testsq->getColor() == getColorfromTurn()) {
+                vector<pair<int, int>> testpieces = returnPieceMoves(testsq);
+                stringSquare start = getStringSquare(j, i);
+                //cout << testsq->getColor() << " " << testsq->getPiece() << " at " << start << endl;
+                // if(testpieces.size() != 0) {
+                //     cout << "    ->";
+                // }
+                for(int i = 0; i < testpieces.size(); i++) {
+                    int tempx = testpieces[i].first;
+                    int tempy = testpieces[i].second;
+                    stringSquare end = getStringSquare(tempx, tempy);
+                    pair<stringSquare, stringSquare> addMove = make_pair(start, end);
+                    // if(testpieces.size()-1 > i) {
+                    //     cout << end << ", ";
+                    // } else {
+                    //     cout << end << endl;
+                    // }
+                    all_moves.push_back(addMove);
+                }
+            }
+        }
+    }
+
+    return all_moves;
+}
+
+vector<pair<int, int>> ChessBoard::returnPieceMoves(Square* piece) {
+    vector<pair<int, int>> allmoves;
+    vector<pair<int, int>> bishopmoves;
+    switch(piece->getPiece()) { 
+        case KING:
+            allmoves = getKings(piece);
+            break;
+        case QUEEN:
+            allmoves = getVerticalsandHorizontals(piece);
+            bishopmoves = getDiagonals(piece);
+            allmoves.insert(allmoves.end(), bishopmoves.begin(), bishopmoves.end());
+            break;
+        case ROOK:
+            allmoves = getVerticalsandHorizontals(piece);
+            break;
+        case BISHOP:
+            allmoves = getDiagonals(piece);
+            break;
+        case KNIGHT:
+            allmoves = getKnights(piece);
+            break;
+        case PAWN:
+            allmoves = getPawns(piece);
+            break;
+        default:
+            break;
+    }
+    return allmoves;
+}
 
 //bool moves
 bool ChessBoard::canMakeMove(Square* start, Square* end) {
@@ -384,7 +451,7 @@ bool ChessBoard::canBishopMove(Square* bishop, Square* end) {
     return isPairInList(endxy, bishopMoves);
 }
 
-bool ChessBoard::canRookMove(Square* rook, Square* end) { //need castling, long and short
+bool ChessBoard::canRookMove(Square* rook, Square* end) {
     int endx = end->getx();
     int endy = end->gety();
     pair<int, int> endxy = make_pair(endx, endy);
@@ -400,7 +467,7 @@ bool ChessBoard::canKnightMove(Square* knight, Square* end) {
     return isPairInList(endxy, knightMoves);
 }
 
-bool ChessBoard::canPawnMove(Square* pawn, Square* end) {//need en passant, promotion
+bool ChessBoard::canPawnMove(Square* pawn, Square* end) {
     int endx = end->getx();
     int endy = end->gety();
     pair<int, int> endxy = make_pair(endx, endy);
@@ -485,7 +552,7 @@ pair<int, int> ChessBoard::movetHelper(int tempx, int tempy, Square* sq) {
     return p;
 }
 
-vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, promotion
+vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) {
     //cout << "getPawns" << endl;
     vector<pair<int, int>> pawns;
     int x = pawn->getx();
@@ -500,13 +567,13 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
         capture.push_back(make_pair(-1, -1));
         capture.push_back(make_pair(1, -1));
         Square* cap1 = getSquare(x-1, y-1);
-        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor()) {
+        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor() && x-1 >= 0) {
             temp = make_pair(x-1, y-1);
             pawns.push_back(temp);
         }
 
         Square* cap2 = getSquare(x+1, y-1);
-        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor()) {
+        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor() && x+1 <= 7) {
             temp = make_pair(x+1, y-1);
             pawns.push_back(temp);
         }
@@ -545,13 +612,14 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
         capture.push_back(make_pair(-1, 1));
         capture.push_back(make_pair(1, 1));
         Square* cap1 = getSquare(x-1, y+1);
-        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor()) {
+        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor() && x-1 >= 0) {
+            cout <<"black pawn cap x: " <<cap1->getx() << endl;
             temp = make_pair(x-1, y+1);
             pawns.push_back(temp);
         }
 
         Square* cap2 = getSquare(x+1, y+1);
-        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor()) {
+        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor() && x+1 <= 7) {
             temp = make_pair(x+1, y+1);
             pawns.push_back(temp);
         }
@@ -584,6 +652,11 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
         }
     }
 
+
+    // cout << "getPawns()" << endl;
+    // for(int i = 0; i < pawns.size(); i++) {
+    //     cout << pawns[i].first << ", " << pawns[i].first << endl;
+    // }
     return pawns;
 }
 
@@ -614,7 +687,7 @@ vector<pair<int, int>> ChessBoard::getKnights(Square* knight) {
     return knights;
 }
 
-vector<pair<int, int>> ChessBoard::getKings(Square* king) {//need cant castle though or into check 
+vector<pair<int, int>> ChessBoard::getKings(Square* king) {
     //cout << "getKings" << endl;
     vector<pair<int, int>> kings;
     int x = king->getx();
@@ -911,4 +984,76 @@ Square* ChessBoard::getSquare(stringSquare strsq) {
     }
     Square* sq = getSquare(x, y);
     return sq;
+}
+
+stringSquare ChessBoard::getStringSquare(int x, int y) {
+    int value = x*8 + y;
+    stringSquare s= MOVE;
+    switch(value){
+        case 0: s= a8; break;
+        case 1: s= a7; break;
+        case 2: s= a6; break;
+        case 3: s= a5; break;
+        case 4: s= a4; break;
+        case 5: s= a3; break;
+        case 6: s= a2; break;
+        case 7: s= a1; break;
+        case 8: s= b8; break;
+        case 9: s= b7; break;
+        case 10: s= b6; break;
+        case 11: s= b5; break;
+        case 12: s= b4; break;
+        case 13: s= b3; break;
+        case 14: s= b2; break;
+        case 15: s= b1; break;
+        case 16: s= c8; break;
+        case 17: s= c7; break;
+        case 18: s= c6; break;
+        case 19: s= c5; break;
+        case 20: s= c4; break;
+        case 21: s= c3; break;
+        case 22: s= c2; break;
+        case 23: s= c1; break;
+        case 24: s= d8; break;
+        case 25: s= d7; break;
+        case 26: s= d6; break;
+        case 27: s= d5; break;
+        case 28: s= d4; break;
+        case 29: s= d3; break;
+        case 30: s= d2; break;
+        case 31: s= d1; break;
+        case 32: s= e8; break;
+        case 33: s= e7; break;
+        case 34: s= e6; break;
+        case 35: s= e5; break;
+        case 36: s= e4; break;
+        case 37: s= e3; break;
+        case 38: s= e2; break;
+        case 39: s= e1; break;
+        case 40: s= f8; break;
+        case 41: s= f7; break;
+        case 42: s= f6; break;
+        case 43: s= f5; break;
+        case 44: s= f4; break;
+        case 45: s= f3; break;
+        case 46: s= f2; break;
+        case 47: s= f1; break;
+        case 48: s= g8; break;
+        case 49: s= g7; break;
+        case 50: s= g6; break;
+        case 51: s= g5; break;
+        case 52: s= g4; break;
+        case 53: s= g3; break;
+        case 54: s= g2; break;
+        case 55: s= g1; break;
+        case 56: s= h8; break;
+        case 57: s= h7; break;
+        case 58: s= h6; break;
+        case 59: s= h5; break;
+        case 60: s= h4; break;
+        case 61: s= h3; break;
+        case 62: s= h2; break;
+        case 63: s= h1; break;
+    }
+    return s;
 }
