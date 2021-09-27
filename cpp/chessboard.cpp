@@ -335,57 +335,28 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
 vector<pair<stringSquare, stringSquare>> ChessBoard::getAllMoves() {
     vector<pair<stringSquare, stringSquare>> all_moves;
 
-    cout << "turnColor " << turnColor << endl;
-    if(turnColor == 0) {//white
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* start = getSquare(j, i);
-                if(start->getColor() == WHITE) {
-                    cout << endl << "-----------------------" << endl;
-                    cout << "x, y, color, piece: " << start->getx() << ", " << start->gety() << ", " << start->getColor() << ", "<< start->getPiece() <<endl;
-                    vector<pair<int, int>> temp = returnPieceMoves(start);
-                    cout << "num of moves vector: " << temp.size() << endl;
-                    for(int k = 0; k < temp.size(); k++) {
-
-                        cout << "move x, y: " << temp[i].first << ", " << temp[i].second << endl;
-                        // int tempx = temp[i].first;
-                        // int tempy = temp[i].second;
-                        // Square* end = getSquare(tempx, tempy);
-
-                        // // bool ispossiblemove = canMakeMove(start, end);
-                        // // //cout << "can make move : " << ispossiblemove << endl;
-                        // // if(ispossiblemove) {
-                        //     stringSquare startString = getStringSquare(start->getx(), start->gety());
-                        
-                        //     stringSquare endString = getStringSquare(tempx, tempy);
-                        //     pair<stringSquare, stringSquare> p = make_pair(startString, endString);
-                        //     cout << "endmove x, y: " << tempx <<", " << tempy << endl;
-                        //     cout << "move: " << start->getPiece() << " - " <<  startString << endString << endl << endl;
-                        //     all_moves.push_back(p);
-                        //}
-                    }
-                    cout << "-----------------------" << endl << endl;
-                }
-            }
-        }
-    } else { //black
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* start = getSquare(i, j);
-                if(start->getColor() == BLACK) {
-                    vector<pair<int, int>> temp = returnPieceMoves(start);
-                    for(int k = 0; k < temp.size(); k++) {
-                        int tempx = start->getx() + temp[i].first;
-                        int tempy = start->gety() + temp[i].second;
-                        Square* end = getSquare(tempx, tempy);
-                        if(canMakeMove(start, end)) {
-                            stringSquare startString = getStringSquare(start->getx(), start->gety());
-                        
-                            stringSquare endString = getStringSquare(tempx, tempy);
-                            pair<stringSquare, stringSquare> p = make_pair(startString, endString);
-                            all_moves.push_back(p);
-                        }
-                    }
+    //cout << "turnColor " << turnColor << endl;
+    for(int i = 0; i < 8; i++) {
+        for(int j = 0; j < 8; j++) {
+            Square* testsq = getSquare(j, i);
+            if(testsq->getPiece() != EMPTY && testsq->getColor() == getColorfromTurn()) {
+                vector<pair<int, int>> testpieces = returnPieceMoves(testsq);
+                stringSquare start = getStringSquare(j, i);
+                //cout << testsq->getColor() << " " << testsq->getPiece() << " at " << start << endl;
+                // if(testpieces.size() != 0) {
+                //     cout << "    ->";
+                // }
+                for(int i = 0; i < testpieces.size(); i++) {
+                    int tempx = testpieces[i].first;
+                    int tempy = testpieces[i].second;
+                    stringSquare end = getStringSquare(tempx, tempy);
+                    pair<stringSquare, stringSquare> addMove = make_pair(start, end);
+                    // if(testpieces.size()-1 > i) {
+                    //     cout << end << ", ";
+                    // } else {
+                    //     cout << end << endl;
+                    // }
+                    all_moves.push_back(addMove);
                 }
             }
         }
@@ -480,7 +451,7 @@ bool ChessBoard::canBishopMove(Square* bishop, Square* end) {
     return isPairInList(endxy, bishopMoves);
 }
 
-bool ChessBoard::canRookMove(Square* rook, Square* end) { //need castling, long and short
+bool ChessBoard::canRookMove(Square* rook, Square* end) {
     int endx = end->getx();
     int endy = end->gety();
     pair<int, int> endxy = make_pair(endx, endy);
@@ -496,7 +467,7 @@ bool ChessBoard::canKnightMove(Square* knight, Square* end) {
     return isPairInList(endxy, knightMoves);
 }
 
-bool ChessBoard::canPawnMove(Square* pawn, Square* end) {//need en passant, promotion
+bool ChessBoard::canPawnMove(Square* pawn, Square* end) {
     int endx = end->getx();
     int endy = end->gety();
     pair<int, int> endxy = make_pair(endx, endy);
@@ -581,7 +552,7 @@ pair<int, int> ChessBoard::movetHelper(int tempx, int tempy, Square* sq) {
     return p;
 }
 
-vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //gets all pawn moves
+vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) {
     //cout << "getPawns" << endl;
     vector<pair<int, int>> pawns;
     int x = pawn->getx();
@@ -716,7 +687,7 @@ vector<pair<int, int>> ChessBoard::getKnights(Square* knight) {
     return knights;
 }
 
-vector<pair<int, int>> ChessBoard::getKings(Square* king) {//need cant castle though or into check 
+vector<pair<int, int>> ChessBoard::getKings(Square* king) {
     //cout << "getKings" << endl;
     vector<pair<int, int>> kings;
     int x = king->getx();
