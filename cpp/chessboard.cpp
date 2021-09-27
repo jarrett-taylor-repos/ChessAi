@@ -395,8 +395,9 @@ vector<pair<stringSquare, stringSquare>> ChessBoard::getAllMoves() {
 }
 
 vector<pair<int, int>> ChessBoard::returnPieceMoves(Square* piece) {
-    vector<pair<int, int>> allmoves, bishopmoves;
-    switch(piece->getPiece()) { //need to check if actually legal
+    vector<pair<int, int>> allmoves;
+    vector<pair<int, int>> bishopmoves;
+    switch(piece->getPiece()) { 
         case KING:
             allmoves = getKings(piece);
             break;
@@ -580,7 +581,7 @@ pair<int, int> ChessBoard::movetHelper(int tempx, int tempy, Square* sq) {
     return p;
 }
 
-vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, promotion
+vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //gets all pawn moves
     //cout << "getPawns" << endl;
     vector<pair<int, int>> pawns;
     int x = pawn->getx();
@@ -595,13 +596,13 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
         capture.push_back(make_pair(-1, -1));
         capture.push_back(make_pair(1, -1));
         Square* cap1 = getSquare(x-1, y-1);
-        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor()) {
+        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor() && x-1 >= 0) {
             temp = make_pair(x-1, y-1);
             pawns.push_back(temp);
         }
 
         Square* cap2 = getSquare(x+1, y-1);
-        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor() && cap2->getx() <= 7) {
+        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor() && x+1 <= 7) {
             temp = make_pair(x+1, y-1);
             pawns.push_back(temp);
         }
@@ -640,13 +641,14 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
         capture.push_back(make_pair(-1, 1));
         capture.push_back(make_pair(1, 1));
         Square* cap1 = getSquare(x-1, y+1);
-        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor()) {
+        if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor() && x-1 >= 0) {
+            cout <<"black pawn cap x: " <<cap1->getx() << endl;
             temp = make_pair(x-1, y+1);
             pawns.push_back(temp);
         }
 
         Square* cap2 = getSquare(x+1, y+1);
-        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor()) {
+        if(cap2->getPiece() != EMPTY && cap2->getColor() != pawn->getColor() && x+1 <= 7) {
             temp = make_pair(x+1, y+1);
             pawns.push_back(temp);
         }
@@ -680,10 +682,10 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) { //need en passant, p
     }
 
 
-    cout << "getPawns()" << endl;
-    for(int i = 0; i < pawns.size(); i++) {
-        cout << pawns[i].first << ", " << pawns[i].first << endl;
-    }
+    // cout << "getPawns()" << endl;
+    // for(int i = 0; i < pawns.size(); i++) {
+    //     cout << pawns[i].first << ", " << pawns[i].first << endl;
+    // }
     return pawns;
 }
 
