@@ -202,5 +202,80 @@ int main() {
         board.printBoard();
     */
 
+    /* 
+        //TEST PROMOTION, WORKING
+        //white and black should pass, WORKING
+        ChessBoard board;
+        board.printBoard();
+        board.makeMove(g2, g4);
+        board.makeMove(e7, e6);
+        board.makeMove(g4, g5);
+        board.makeMove(f7, f5);
+        board.makeMove(g5, f6); //en passant white
+        board.makeMove(d7, d5);
+        board.makeMove(f2, f3);
+        board.makeMove(d5, d4);
+        board.makeMove(e2, e4);
+        board.makeMove(d4, e3); //en passant black
+        board.makeMove(f6, g7);
+        board.makeMove(e3, e2);
+        board.printBoard();
+        board.makeMove(g7, h8); //promotion for white
+        board.printBoard();
+        board.makeMove(e2, f1);//promotion for black
+        board.printBoard();
+    */
 
+    /*
+        //TEST GETSTRINGSQUARE(), WORKING
+        ChessBoard board;
+        board.printBoard();
+        stringSquare strsq = board.getStringSquare(0, 0);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(3, 1);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(7, 7);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(3, 5);
+        cout << strsq << endl;
+    */
+
+    /*
+        //TEST getAllMoves(), WORKING??
+        ChessBoard board;
+        board.printBoard();
+        vector<pair<stringSquare, stringSquare>> allmoves = board.getAllMoves();
+        cout << "Number of moves =  " <<  allmoves.size() << endl;
+        for(int i = 0; i < allmoves.size(); i++) {
+            cout << "move " << (i+1) << ": " << allmoves[i].first << allmoves[i].second << endl;
+            board.makeMove(allmoves[i].first, allmoves[i].second);
+            cout << "next possible moves: " << board.getAllMoves().size() << endl;
+        }
+    */
+   
+
+    /*
+        //TEST IS isstringSquareInList, working
+        stringSquare teste1 = e1;
+        vector<pair<stringSquare, stringSquare>> testpair;
+        testpair.push_back(make_pair(d1, e1));
+        bool inCheck = isstringSquareInList(teste1, testpair);
+
+        if(inCheck) {
+            cout << "in check" << endl;
+        } else {
+            cout << "not in check" << endl;
+        }
+        vector<pair<stringSquare, stringSquare>> testpair2;
+        testpair2.push_back(make_pair(d1, d2));
+        inCheck = isstringSquareInList(teste1, testpair2);
+        
+        if(inCheck) {
+            cout << "in check" << endl;
+        } else {
+            cout << "not in check" << endl;
+        }
+    */
+
+    
 }
