@@ -23,9 +23,24 @@ class ChessBoard {
 
 
         void makeMove(stringSquare strstart, stringSquare strend);
+        void removeLastMove();
         vector<pair<stringSquare, stringSquare>> getAllMoves();
         vector<pair<int, int>> returnPieceMoves(Square* piece);
+        vector<pair<stringSquare, stringSquare>> getallLegalMoves();
 
+
+        bool isInRange(int x, int y);
+        bool isKingAttacked();
+        bool isWhiteKingCheck();
+        bool isBlackKingCheck();
+        bool isPieceAttacked(Square* square);
+        bool foundAttacker(Square* square);
+        bool isrookAttacker(Square* square);
+        bool isbishopAttacker(Square* square);
+        bool isqueenAttacker(Square* square);
+        bool isknightAttacker(Square* square);
+        bool iskingAttacker(Square* square);
+        bool ispawnAttacker(Square* square);
 
         bool canMakeMove(Square* start, Square* end);
         bool canKingMove(Square* start, Square* end);
@@ -50,12 +65,13 @@ class ChessBoard {
         void printAllMoves();
         void printTurnandMove();
         void printBoard();
+        void printChecks();
 
 
         Color getColorfromTurn();
         void setTurnColor(int t);
 
-
+        Square* getSquare(Piece p, Color c);
         Square* getSquare(stringSquare strsq);
         Square* getSquare(int x, int y);
         stringSquare getStringSquare(int x, int y);
@@ -179,7 +195,6 @@ string ChessBoard::getBoardFEN() {
         }
         return fen;
     }
-
 
 //make move
 void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
@@ -331,6 +346,10 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
     }
 }
 
+void ChessBoard::removeLastMove() {
+    
+}
+
 //get moves 
 vector<pair<stringSquare, stringSquare>> ChessBoard::getAllMoves() {
     vector<pair<stringSquare, stringSquare>> all_moves;
@@ -395,7 +414,402 @@ vector<pair<int, int>> ChessBoard::returnPieceMoves(Square* piece) {
     return allmoves;
 }
 
+vector<pair<stringSquare, stringSquare>> ChessBoard::getallLegalMoves() { //if this is empty and king is attack, game is checkmate
+    //getallmoves
+    //see if king is in check
+    //if king is in check, remove that move, 
+
+    bool incheck;
+    if(getColorfromTurn() == WHITE) {
+        incheck = isWhiteKingCheck();
+    } else {
+        incheck = isBlackKingCheck();
+    }
+    vector<pair<stringSquare, stringSquare>> alllegalmoves;
+    vector<pair<stringSquare, stringSquare>> allmoves = getAllMoves();
+    bool incheck = isKingAttacked();
+    if(incheck) {
+        //for each move,
+        //get all legal moves and see if king can be taken
+        ChessBoard copy();
+        for(int i = 0; i < allmoves.size(); i++) {
+            stringSquare move_start = allmoves[i].first;
+            stringSquare move_end = allmoves[i].second;
+            makeMove(move_start, move_end);
+
+            bool futurecheck;
+            if(getColorfromTurn() == WHITE) {
+                futurecheck = isWhiteKingCheck();
+            } else {
+                futurecheck = isBlackKingCheck();
+            }
+
+            if(futurecheck != true) {
+                alllegalmoves.push_back(allmoves[i]);
+            }
+            //removeLastMove();
+        }
+    } else {
+        return allmoves;
+    }
+    return alllegalmoves;
+}
+
+
 //bool moves
+bool ChessBoard::isInRange(int x, int y) {
+    return (x >= 0) && (x <= 7) &&
+            (y >= 0) && (y <= 7);
+}
+
+bool ChessBoard::isWhiteKingCheck() {
+    Square* whiteking;
+    for(int x = 0; x < 8; x++) {
+        for(int y = 0; y < 8; y++) {
+            Square* temp = getSquare(x, y);
+            if(temp->getColor() == WHITE && temp->getPiece() == KING) {
+                whiteking = temp;
+            }
+        }
+    }
+    bool incheck = isPieceAttacked(whiteking);
+
+    return incheck;
+}
+
+bool ChessBoard::isBlackKingCheck() {
+    Square* blackking;
+    for(int x = 0; x < 8; x++) {
+        for(int y = 0; y < 8; y++) {
+            Square* temp = getSquare(x, y);
+            if(temp->getColor() == BLACK && temp->getPiece() == KING) {
+                blackking = temp;
+            }
+        }
+    }
+    bool incheck = isPieceAttacked(blackking);
+
+    return incheck;
+}
+
+bool ChessBoard::isPieceAttacked(Square* square) {
+    Color testcolor = square->getColor();
+    Piece testpiece = square->getPiece();
+
+    if(testcolor == NONE || testpiece == EMPTY) {
+        return false;
+    } else {
+        return foundAttacker(square);
+    }
+}
+
+bool ChessBoard::foundAttacker(Square* square) {
+    bool hasAttacker = isrookAttacker(square) || isbishopAttacker(square) || isknightAttacker(square) || ispawnAttacker(square);
+    return hasAttacker;
+}
+
+bool ChessBoard::isrookAttacker(Square* square) {
+    //get all moves until piece is found, horizontal and vertical
+    Piece currpiece = square->getPiece();
+    Color currcolor = square->getColor();
+    int currx = square->getx();
+    int curry = square->gety();
+
+    vector<pair<int, int>> pairs;
+    //left
+    for(int i = currx; i < 8; i++) {
+        int tempx = i;
+        int tempy = curry;
+        Square* temp = getSquare(tempx, tempy);
+        if(temp->getColor() == currcolor) {
+            break;
+        } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+            break;
+        } else {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+        }
+    }
+
+    //right
+    for(int i = currx; i >= 0; i--) {
+        int tempx = i;
+        int tempy = curry;
+        Square* temp = getSquare(tempx, tempy);
+        if(temp->getColor() == currcolor) {
+            break;
+        } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+            break;
+        } else {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+        }
+    }
+
+    //up
+    for(int i = curry; i >= 0; i--) {
+        int tempx = currx;
+        int tempy = i;
+        Square* temp = getSquare(tempx, tempy);
+        if(temp->getColor() == currcolor) {
+            break;
+        } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+            break;
+        } else {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+        }
+    }
+
+
+    //down
+    for(int i = curry; i < 8; i++) {
+        int tempx = currx;
+        int tempy = i;
+        Square* temp = getSquare(tempx, tempy);
+        if(temp->getColor() == currcolor) {
+            break;
+        } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+            break;
+        } else {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+        }
+    }
+
+
+    //check vector pairs
+    for(int i = 0; i < pairs.size(); i++) {
+        int tempx = currx + pairs[i].first;
+        int tempy = curry + pairs[i].second;
+        Square* temp = getSquare(tempx, tempy);
+        bool isAttackingRook = ((temp->getPiece() == ROOK) ||  (temp->getPiece() == QUEEN)) && (temp->getColor() != currcolor);
+        if(isAttackingRook) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool ChessBoard::isbishopAttacker(Square* square) {
+    Piece currpiece = square->getPiece();
+    Color currcolor = square->getColor();
+    int currx = square->getx();
+    int curry = square->gety();
+
+    vector<pair<int, int>> pairs;
+    //up left (-x, -y)
+    for(int x = currx; x >= 0; x--) {
+        for(int y = curry; y >= 0; y--) {
+            int tempx = x;
+            int tempy = y;
+            Square* temp = getSquare(tempx, tempy);
+            if(temp->getColor() == currcolor) {
+                break;
+            } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+                break;
+            } else {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+            }
+        }
+    }
+
+    //down left (-x, +y)
+    for(int x = currx; x >= 0; x--) {
+        for(int y = curry; y < 8; y++) {
+            int tempx = x;
+            int tempy = y;
+            Square* temp = getSquare(tempx, tempy);
+            if(temp->getColor() == currcolor) {
+                break;
+            } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+                break;
+            } else {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+            }
+        }
+    }
+
+    //down right (+x, +y)
+    for(int x = currx; x < 8; x++) {
+        for(int y = curry; y < 8; y++) {
+            int tempx = x;
+            int tempy = y;
+            Square* temp = getSquare(tempx, tempy);
+            if(temp->getColor() == currcolor) {
+                break;
+            } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+                break;
+            } else {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+            }
+        }
+    }
+
+    //up right (+x, -y)
+    for(int x = currx; x < 8; x++) {
+        for(int y = curry; y >= 0; y--) {
+            int tempx = x;
+            int tempy = y;
+            Square* temp = getSquare(tempx, tempy);
+            if(temp->getColor() == currcolor) {
+                break;
+            } else if(temp->getColor() != NONE && temp->getColor() != currcolor) {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+                break;
+            } else {
+                pair<int, int> newpair = make_pair(tempx, tempy);
+                pairs.push_back(newpair);
+            }
+        }
+    }
+
+    //check vector pairs
+    for(int i = 0; i < pairs.size(); i++) {
+        int tempx = currx + pairs[i].first;
+        int tempy = curry + pairs[i].second;
+        Square* temp = getSquare(tempx, tempy);
+        bool isAttackingRook = ((temp->getPiece() == BISHOP) ||  (temp->getPiece() == QUEEN)) && (temp->getColor() != currcolor);
+        if(isAttackingRook) {
+            return true;
+        }
+    }
+    
+    return false;
+
+}
+
+bool ChessBoard::isknightAttacker(Square* square) {
+    Piece currpiece = square->getPiece();
+    Color currcolor = square->getColor();
+    int currx = square->getx();
+    int curry = square->gety();
+
+    vector<pair<int, int>> pairs;
+    pairs.push_back(make_pair(-1, -2));
+    pairs.push_back(make_pair(-2, -1));
+    pairs.push_back(make_pair(-2, 1));
+    pairs.push_back(make_pair(-1, 2));
+    pairs.push_back(make_pair(1, 2));
+    pairs.push_back(make_pair(2, 1));
+    pairs.push_back(make_pair(2, -1));
+    pairs.push_back(make_pair(1, -2));
+
+    vector<pair<int, int>> searched_pairs;
+
+    for(int i = 0; i < pairs.size(); i++) {
+        int tempx = currx + pairs[i].first;
+        int tempy = curry + pairs[i].second;
+        bool onboard = isInRange(tempx, tempy);
+        if(onboard) {
+            searched_pairs.push_back(pairs[i]);
+        }
+    }
+
+    for(int i = 0; i < searched_pairs.size(); i++) {
+        int tempx = currx + searched_pairs[i].first;
+        int tempy = curry + searched_pairs[i].second;
+        Square* temp = getSquare(tempx, tempy);
+        bool isAttckingKnight = (temp->getPiece() == KNIGHT) && (temp->getColor() != currcolor);
+        if(isAttckingKnight) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool ChessBoard::iskingAttacker(Square* square) {
+    Piece currpiece = square->getPiece();
+    Color currcolor = square->getColor();
+    int currx = square->getx();
+    int curry = square->gety();
+
+    vector<pair<int, int>> pairs;
+    pairs.push_back(make_pair(-1, -1));
+    pairs.push_back(make_pair(-1, 0));
+    pairs.push_back(make_pair(-1, 1));
+    pairs.push_back(make_pair(0, -1));
+    pairs.push_back(make_pair(0, 1));
+    pairs.push_back(make_pair(1, -1));
+    pairs.push_back(make_pair(1, 0));
+    pairs.push_back(make_pair(1, 1));
+
+    vector<pair<int, int>> searched_pairs;
+
+    for(int i = 0; i < pairs.size(); i++) {
+        int tempx = currx + pairs[i].first;
+        int tempy = curry + pairs[i].second;
+        bool onboard = isInRange(tempx, tempy);
+        if(onboard) {
+            searched_pairs.push_back(pairs[i]);
+        }
+    }
+
+    for(int i = 0; i < searched_pairs.size(); i++) {
+        int tempx = currx + searched_pairs[i].first;
+        int tempy = curry + searched_pairs[i].second;
+        Square* temp = getSquare(tempx, tempy);
+        bool isAttckingKnight = (temp->getPiece() == KING) && (temp->getColor() != currcolor);
+        if(isAttckingKnight) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool ChessBoard::ispawnAttacker(Square* square) {
+    Piece currpiece = square->getPiece();
+    Color currcolor = square->getColor();
+    int currx = square->getx();
+    int curry = square->gety();
+
+    vector<pair<int, int>> pairs;
+
+    if(currcolor == WHITE) {
+        Square* temp1 = getSquare(currx-1, curry-1);
+        Square* temp2 = getSquare(currx+1, curry-1);
+        bool isAttackingBlackPawn = (temp1->getColor() == BLACK && temp1->getPiece() == PAWN) ||
+            (temp2->getColor() == BLACK && temp2->getPiece() == PAWN);
+
+        if(isAttackingBlackPawn) {
+            return true;
+        }
+    } else { //color is BLACK
+        Square* temp1 = getSquare(currx-1, curry+1);
+        Square* temp2 = getSquare(currx+1, curry+1);
+        bool isAttackingWhitePawn = (temp1->getColor() == BLACK && temp1->getPiece() == PAWN) ||
+            (temp2->getColor() == BLACK && temp2->getPiece() == PAWN);
+
+        if(isAttackingWhitePawn) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 bool ChessBoard::canMakeMove(Square* start, Square* end) {
 
     switch(start->getPiece()) { //need to check if actually legal
@@ -613,7 +1027,6 @@ vector<pair<int, int>> ChessBoard::getPawns(Square* pawn) {
         capture.push_back(make_pair(1, 1));
         Square* cap1 = getSquare(x-1, y+1);
         if(cap1->getPiece() != EMPTY && cap1->getColor() != pawn->getColor() && x-1 >= 0) {
-            cout <<"black pawn cap x: " <<cap1->getx() << endl;
             temp = make_pair(x-1, y+1);
             pawns.push_back(temp);
         }
@@ -882,9 +1295,10 @@ void ChessBoard::printTurnandMove() {
     }
 }
 
-void ChessBoard::printBoard() { //IS WORKING
+void ChessBoard::printBoard() { 
     cout <<"-------------"<< endl;
     printTurnandMove();
+    printChecks();
     for(int y = 0; y < 8; y++) {
         for(int x = 0; x < 8; x++) {
             chessboard[x][y].printSquare();
@@ -894,6 +1308,18 @@ void ChessBoard::printBoard() { //IS WORKING
     cout <<"-------------"<< endl << endl;
 }
 
+void ChessBoard::printChecks() {
+    bool whitecheck = isWhiteKingCheck();
+    bool blackcheck = isBlackKingCheck();
+
+    if(whitecheck) {
+        cout << "WHITE is in check" << endl;
+    }
+    if(blackcheck) {
+        cout << "BLACK is in check" << endl;
+    }
+
+}
 
 //color
 Color ChessBoard::getColorfromTurn() {
@@ -910,6 +1336,17 @@ void ChessBoard::setTurnColor(int t) {
 
 
 //return square
+Square* ChessBoard::getSquare(Piece p, Color c) {
+    for(int i = 0; i < 8; i++) {
+        for(int j = 0; j < 8; j++) {
+            Square* temp = getSquare(i, j);
+            if(temp->getColor() == c && temp->getPiece() == p) {
+                return temp;
+            }
+        }
+    }
+}
+
 Square* ChessBoard::getSquare(int x, int y) {
     return &chessboard[x][y];
 }

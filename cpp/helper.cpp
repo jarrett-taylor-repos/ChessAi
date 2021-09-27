@@ -85,6 +85,18 @@ bool isPairInList(pair<int, int> p, vector<pair<int, int>> vect) {
   return false;
 }
 
+bool isstringSquareInList(stringSquare strsq, vector<pair<stringSquare, stringSquare>> vect) {
+  for(int i = 0; i < vect.size(); i++) {
+    //cout << strsq << ", " << vect[i].second << endl;
+    bool p1 = (strsq == vect[i].second);
+    //cout << p1 << endl;
+    if(p1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 vector<int> getFileRank(int num) {
   int file, rank;
   vector<int> nums;

@@ -240,6 +240,42 @@ int main() {
         cout << strsq << endl;
     */
 
-
+    /*
+        //TEST getAllMoves(), WORKING??
+        ChessBoard board;
+        board.printBoard();
+        vector<pair<stringSquare, stringSquare>> allmoves = board.getAllMoves();
+        cout << "Number of moves =  " <<  allmoves.size() << endl;
+        for(int i = 0; i < allmoves.size(); i++) {
+            cout << "move " << (i+1) << ": " << allmoves[i].first << allmoves[i].second << endl;
+            board.makeMove(allmoves[i].first, allmoves[i].second);
+            cout << "next possible moves: " << board.getAllMoves().size() << endl;
+        }
+    */
    
+
+    /*
+        //TEST IS isstringSquareInList, working
+        stringSquare teste1 = e1;
+        vector<pair<stringSquare, stringSquare>> testpair;
+        testpair.push_back(make_pair(d1, e1));
+        bool inCheck = isstringSquareInList(teste1, testpair);
+
+        if(inCheck) {
+            cout << "in check" << endl;
+        } else {
+            cout << "not in check" << endl;
+        }
+        vector<pair<stringSquare, stringSquare>> testpair2;
+        testpair2.push_back(make_pair(d1, d2));
+        inCheck = isstringSquareInList(teste1, testpair2);
+        
+        if(inCheck) {
+            cout << "in check" << endl;
+        } else {
+            cout << "not in check" << endl;
+        }
+    */
+
+    
 }

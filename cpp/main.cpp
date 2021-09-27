@@ -1,16 +1,29 @@
 #include "chessboard.cpp"
 
+
 int main() {
     cout << "Chess AI" << endl;
 
-    //TEST getAllMoves(), WORKING??
-    ChessBoard board;
-    board.printBoard();
-    vector<pair<stringSquare, stringSquare>> allmoves = board.getAllMoves();
-    cout << "Number of moves =  " <<  allmoves.size() << endl;
-    for(int i = 0; i < allmoves.size(); i++) {
-        cout << "move " << (i+1) << ": " << allmoves[i].first << allmoves[i].second << endl;
-    }
+    //test if kingattacked, pending
+    // bool incheck;
+    // ChessBoard cb;
+    // cb.printBoard();
+    // cb.makeMove(e2, e4);
+    // cb.makeMove(f7, f6);
+    // cb.makeMove(d1, h5);
+    // cb.printBoard();
+    // incheck = cb.isKingAttacked();
+    // if(incheck) { cout << "incheck" << endl;} else {cout << "not in check" << endl;}
+
+    //test new check idea, pending
+    ChessBoard cb;
+    cb.printBoard();
+    cb.makeMove(e2, e4);
+    cb.makeMove(f7, f6);
+    cb.makeMove(d1, h5);
+    cb.printBoard();
+
+
     return 0;
 
 
