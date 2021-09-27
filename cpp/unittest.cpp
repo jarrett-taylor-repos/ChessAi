@@ -226,5 +226,20 @@ int main() {
         board.printBoard();
     */
 
+    /*
+        //TEST GETSTRINGSQUARE(), WORKING
+        ChessBoard board;
+        board.printBoard();
+        stringSquare strsq = board.getStringSquare(0, 0);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(3, 1);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(7, 7);
+        cout << strsq << endl;
+        strsq = board.getStringSquare(3, 5);
+        cout << strsq << endl;
+    */
+
+
    
 }
