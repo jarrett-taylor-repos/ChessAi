@@ -277,5 +277,65 @@ int main() {
         }
     */
 
-    
+    /*
+        //test remove last move -   WORKING
+        ChessBoard board;
+        board.makeMove(g2, g3); //pawn move
+        // board.printBoard();
+        // board.removeLastMove(); //working
+        // board.printBoard();
+        board.makeMove(g7, g6);
+        board.makeMove(f1, g2);
+        board.makeMove(f8, g7);
+        board.makeMove(g1, f3);
+        board.makeMove(g8, f6);
+        board.makeMove(e1, g1); //castle white
+        board.makeMove(e8, g8); //castle black
+        // board.printBoard();
+        // board.removeLastMove(); //working
+        // board.printBoard();
+        board.makeMove(d2, d4);
+        board.makeMove(a7, a5);
+        board.makeMove(d4, d5);
+        board.makeMove(c7, c5);
+        board.makeMove(d5, c6); //en passant white
+        board.makeMove(a5, a4);
+        board.makeMove(b2, b4);
+        board.makeMove(a4, b3); //en passant black
+        // board.printBoard();
+        // board.removeLastMove(); //working
+        // board.printBoard();
+        board.makeMove(c6, b7);
+        board.makeMove(b3, a2);
+        board.makeMove(b7, a8); //promotion white
+        board.makeMove(a2, b1); //promotion black
+        board.printBoard();
+        board.removeLastMove(); //working
+        board.printBoard();
+    */
+
+    /*
+        //test new check idea and cant make move that is out of check, working i think
+        ChessBoard cb;
+        cb.makeMove(e2, e3);
+        cb.makeMove(f7, f5);
+        cb.makeMove(d1, h5); //black in check, bishop working
+        cb.printBoard();
+        //cb.makeMove(g8, f6); //says cant make this move
+        cb.makeMove(g7, g6); //only legal move
+        cb.printBoard();    
+
+        // cb.makeMove(f2, f3);
+        // cb.makeMove(e7, e6);
+        // cb.makeMove(a2, a3);
+        // cb.makeMove(d8, h4); //white in check, bishop working
+        // cb.printBoard();
+
+        // vector<pair<stringSquare, stringSquare>> legalmoves = cb.getallLegalMoves();  //workign
+        // cout << legalmoves.size() << endl;
+        // for(int i = 0; i < legalmoves.size(); i++) {
+        //     cout << legalmoves[i].first << legalmoves[i].second << endl;
+        // }
+    */
+
 }

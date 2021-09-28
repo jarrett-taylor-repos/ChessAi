@@ -11,6 +11,8 @@
         "initializer_list": "cpp",
         "ranges": "cpp",
         "tuple": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "ostream": "cpp",
+        "type_traits": "cpp"
     }
 }
