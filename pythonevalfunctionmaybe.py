@@ -161,6 +161,7 @@ def evalpos(boardd):
     global timespenteval
     totalevals = totalevals+1
     t2 = time.time()
+    if printlogs: print('zzevaluating board:',boardd.fen(),file=log2)
 
     if boardd.is_game_over():
         result = boardd.outcome().result()
@@ -238,6 +239,7 @@ def evalpos(boardd):
         timespenteval += time.time()-t2
         return evalu
 
+
 def sortmoves(boardd):
     legalmoves = list(boardd.legal_moves)
     bestmovenumberarray = []
@@ -282,7 +284,8 @@ def pruning2(boardd,depth):
         tempboard.pop()
 
     #depthvals
-    numfordepth = [len(evals),max([round(len(evals)/2),5]),max([round(len(evals)/4),4]),4,2,2,2,2,2]
+    numfordepth = [len(evals),max([round(len(evals)/2),5]),max([round(len(evals)/4),4]),4,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+    #numfordepth = [len(evals),len(evals),len(evals),len(evals),len(evals),len(evals),len(evals),len(evals)]
     
     for i in range(min([numfordepth[depth],len(evals)])):#round(len(evals)/2)+1):
         if turn==chess.WHITE:
@@ -351,6 +354,7 @@ def findsinglebestmove(boardd,depth,currentdepth=0,minormaxofabove=None):
     if depth==currentdepth:
         legalmoves = list(boardd.legal_moves)
     else:
+        #legalmoves = list(boardd.legal_moves)
         legalmoves = pruning2(boardd,currentdepth)
     
     
@@ -430,7 +434,125 @@ def findsinglebestmove(boardd,depth,currentdepth=0,minormaxofabove=None):
         else:
             return min(bestmovenumberarray)
 
+def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999999):
 
+    if depth==currentdepth:
+        legalmoves = list(boardd.legal_moves)
+
+    elif currentdepth>depth:
+        templegalmoves = list(boardd.legal_moves)
+        legalmoves = []
+
+        #doing movestack stuff, want to change
+        movestack = boardd.move_stack
+        movestack = movestack[len(movestack)-currentdepth-1:len(movestack)]
+        squares = []
+        for i in range(len(movestack)):
+            squares.append(movestack[i].from_square)
+            squares.append(movestack[i].to_square)
+        
+        for i in range(len(templegalmoves)):
+            if boardd.is_capture(templegalmoves[i]) and (templegalmoves[i].from_square in squares or templegalmoves[i].to_square in squares):
+                legalmoves.append(templegalmoves[i])     
+    else:
+        #legalmoves = list(boardd.legal_moves)
+        legalmoves = pruning(boardd)
+        legalmoves = pruning2(boardd,currentdepth)
+
+    if printlogs: print('at depth:',currentdepth,'alpha=',alpha,'beta=',beta,'fen:',boardd.fen(),'testing legal moves:',legalmoves,file=log)
+
+    bestmovenumberarray = []
+    tempboard = boardd.copy()
+    bestmovenumberarray = []
+
+    if currentdepth > depth:
+        
+        bestmovenumberarray.append(evalpos(boardd))
+        if printlogs: print('currentdepth>depth, bestmovenumberarray now:',bestmovenumberarray,file=log)
+    
+    #White move
+    if boardd.turn:
+        for i in range(len(legalmoves)):
+            move = legalmoves[i]
+            tempboard.push(move)
+
+            movestack = tempboard.move_stack
+            if printlogs: print("testing tempboard: ",movestack[len(movestack)-currentdepth-1:len(movestack)],'FEN:',tempboard.fen(),file=log)            
+
+            if tempboard.is_game_over():
+                evalu = evalpos(tempboard)
+            else:
+                evalu = findsinglebestmove2(tempboard,depth,currentdepth+1,alpha,beta)
+
+            if printlogs: print('evaluation for tempboard: ',movestack[len(movestack)-currentdepth-1:len(movestack)],'is',evalu,file=log)   
+            bestmovenumberarray.append(evalu)
+            alpha = max(bestmovenumberarray)
+            if printlogs: print('alpha now:',alpha,'bestmovenumberarraynow:',bestmovenumberarray,'for moves',legalmoves,file=log)
+            if evalu >= beta:
+                if printlogs: print('breaking because evalu:',evalu,'is greater than beta:',beta,file=log)
+                break
+            tempboard.pop()
+        besteval = max(bestmovenumberarray)
+        
+        if currentdepth != 0:
+            if printlogs: print('',file=log)
+            return besteval
+        else:
+            #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
+            #randomnum = random.randint(0,len(locationsofbest)-1)
+            #bestmove = legalmoves[locationsofbest[randomnum]] 
+            bestmove = legalmoves[bestmovenumberarray.index(besteval)]
+            if printlogs: print('SENDING MOVE:',boardd.ply(),':',bestmove,'with eval:',besteval,'bestmovenumberarray:',bestmovenumberarray,'legal moves:',legalmoves,file=log)
+            return bestmove
+
+
+    #black move
+    else:
+        for i in range(len(legalmoves)):
+            move = legalmoves[i]
+            tempboard.push(move)
+
+            #logging
+            movestack = tempboard.move_stack
+            if printlogs: print("testing tempboard: ",movestack[len(movestack)-currentdepth-1:len(movestack)],file=log)
+
+
+            if tempboard.is_game_over():
+                evalu = evalpos(tempboard)
+            else:
+                evalu = findsinglebestmove2(tempboard,depth,currentdepth+1,alpha,beta)
+
+            if printlogs: print('evaluation for tempboard: ',movestack[len(movestack)-currentdepth-1:len(movestack)],'is',evalu,file=log)
+            bestmovenumberarray.append(evalu)
+            beta = min(bestmovenumberarray)
+            if printlogs: print('beta now:',beta,'bestmovenumberarraynow:',bestmovenumberarray,'for moves',legalmoves,file=log)
+            if evalu <= alpha:
+                if printlogs: print('breaking because evalu:',evalu,'is less than alpha:',alpha,file=log)
+                break
+            tempboard.pop()
+        
+        besteval = min(bestmovenumberarray)
+
+        if currentdepth != 0:
+            return besteval
+        else:
+            #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
+            #randomnum = random.randint(0,len(locationsofbest)-1)
+            #bestmove = legalmoves[locationsofbest[randomnum]]
+            bestmove = legalmoves[bestmovenumberarray.index(besteval)]
+            if printlogs: print('found best move',boardd.ply(),':',bestmove,'with eval:',besteval,'bestmovenumberarray:',bestmovenumberarray,'legal moves:',legalmoves,file=log)
+            if printlogs: print('',file=log)
+            return bestmove
+
+
+
+
+
+
+
+
+
+    
 
 def playmove(boardd,nodee):
     totalevals = 0
@@ -445,7 +567,8 @@ def playmove(boardd,nodee):
         nodee = nodee.add_variation(bestmove)
         print('doingbookmove')
     else:
-        bestmove = (findsinglebestmove(boardd,4))
+        #bestmove = (findsinglebestmove(boardd,2))
+        bestmove = findsinglebestmove2(boardd,2)
         nodee = nodee.add_variation(bestmove)
         
     boardd.push(bestmove)
@@ -477,7 +600,7 @@ for i in range(1):
         board4,node = playmove(board4,node)
         print(game)
         print('')
-        #print(game,file=log2)
+        print(game,file=log2)
 
 
     print(board4.outcome())
