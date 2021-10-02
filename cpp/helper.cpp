@@ -97,6 +97,19 @@ bool isstringSquareInList(stringSquare strsq, vector<pair<stringSquare, stringSq
   return false;
 }
 
+bool isMoveinList(pair<stringSquare, stringSquare> p, vector<pair<stringSquare, stringSquare>> vect) {
+  for(int i = 0; i < vect.size(); i++) {
+    bool p1 = (p.first == vect[i].first);
+    bool p2 = (p.second == vect[i].second);
+
+    if(p1 && p2) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
 vector<int> getFileRank(int num) {
   int file, rank;
   vector<int> nums;

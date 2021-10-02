@@ -4,24 +4,30 @@
 int main() {
     cout << "Chess AI" << endl;
 
-    //test if kingattacked, pending
-    // bool incheck;
-    // ChessBoard cb;
-    // cb.printBoard();
-    // cb.makeMove(e2, e4);
-    // cb.makeMove(f7, f6);
-    // cb.makeMove(d1, h5);
-    // cb.printBoard();
-    // incheck = cb.isKingAttacked();
-    // if(incheck) { cout << "incheck" << endl;} else {cout << "not in check" << endl;}
 
-    //test new check idea, pending
+    //test new check idea and cant make move that is out of check, working i think
     ChessBoard cb;
+    cb.makeMove(e2, e3);
+    cb.makeMove(f7, f5);
+    cb.makeMove(d1, h5); //black in check, bishop working
     cb.printBoard();
-    cb.makeMove(e2, e4);
-    cb.makeMove(f7, f6);
-    cb.makeMove(d1, h5);
-    cb.printBoard();
+    //cb.makeMove(g8, f6); //says cant make this move
+    cb.makeMove(g7, g6); //only legal move
+    cb.printBoard();    
+
+    // cb.makeMove(f2, f3);
+    // cb.makeMove(e7, e6);
+    // cb.makeMove(a2, a3);
+    // cb.makeMove(d8, h4); //white in check, bishop working
+    // cb.printBoard();
+
+    // vector<pair<stringSquare, stringSquare>> legalmoves = cb.getallLegalMoves();  //workign
+    // cout << legalmoves.size() << endl;
+    // for(int i = 0; i < legalmoves.size(); i++) {
+    //     cout << legalmoves[i].first << legalmoves[i].second << endl;
+    // }
+    
+
 
 
     return 0;
@@ -31,7 +37,7 @@ int main() {
     //  NEEDS
     //need en-passant, DONE W/ OUT CHECK
     //need castle, DONE W/ OUT CHECK
-    //need concept of check and checkmate
+    //need concept of check and checkmate, pending
     //need 3 repition rule
     //need 50 move rule
     //need stalemate

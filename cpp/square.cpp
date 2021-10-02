@@ -83,10 +83,10 @@ string Square::getSquareString() {
       (color == WHITE) ? s=  "P" : s=  "p";
       break;
     case EMPTY:
-      s=  ".";
+      s=".";
       break; 
     default:
-      s=  "default";
+      s= "default";
       break;
   }
   return s;
