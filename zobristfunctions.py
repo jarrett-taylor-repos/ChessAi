@@ -7,8 +7,6 @@ import random
 
 
 
-
-
 def makezobrist():
     zobrist = []
     for i in range(12):
@@ -45,6 +43,32 @@ def board2zobrist(boardd,zobristarray):
     #for side to move
 
     return zhash
+
+def board2zobrist2(boardd,zobristarray):
+    #getting all pieces
+    zhash = 0
+    materialadv = 0
+    materialvals = [1,3,3,5,9,0,-1,-3,-3,-5,-9,0]
+    avgpawnrank = 0
+    for i in range(64):
+        piecetype = boardd.piece_type_at(i)
+
+        if piecetype != None:
+            
+            color = boardd.color_at(i)
+
+            if not color:
+                piecetype += 6
+                #increasing the row if the piece is black
+            materialadv+=materialvals[piecetype-1]
+            zhash = zhash^zobristarray[piecetype-1][i]
+    if boardd.turn:
+        zhash = zhash^zobristarray[12][0]
+    for i in range(1,13):
+        zhash = zhash^zobristarray[12][i]
+    #for side to move
+
+    return zhash,materialadv
 
 def makezobristmove(boardd,move,zval,zarray):
     fromsquare = move.from_square

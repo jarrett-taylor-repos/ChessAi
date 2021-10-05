@@ -46,30 +46,28 @@ def gameover(boardd):
 
 def rootsearch(boardd,depth):
 
-    '''
+    #'''
     if reader.get(boardd) != None:
         print('book move')
         return reader.choice(boardd).move
-    '''
+    #'''
 
     global zarray
     zval,materialadv = board2zobrist2(boardd,zarray)
-    global bestmoveline
-    bestmoveline = [0 for i in range(depthh+2)]
-    global bestmovelineevals
-    bestmovelineevals = [0 for i in range(depthh+2)]
+
 
     legalmoves = list(boardd.legal_moves)
     lenlegal = len(legalmoves)
-    print(lenlegal)
 
     if lenlegal == 1:
         return legalmoves[0]
 
 
     #need to add pruning / move ordering, should be pretty easy, might move the makezobristmoveandmaterial function
-    besteval = -999999999
+    allevals = []
     bestmove = None
+    alpha = -999999999
+    beta = 999999999
     for i in range(lenlegal):
         move = legalmoves[i]
         newzval,newmaterial = makezobristmoveandmaterial(boardd,move,zval,zarray,materialadv)
@@ -77,17 +75,18 @@ def rootsearch(boardd,depth):
         if boardd.is_repetition(2):
             boardd.pop()
         else:
-            evall = -alphabeta(boardd,newzval,newmaterial,depth,-999999999,999999999)
-            if evall>besteval:
-                besteval=evall
+            evall = -alphabeta(boardd,newzval,newmaterial,depth,-beta,-alpha)
+            allevals.append(evall)
+            if evall>alpha:
+                alpha=evall
                 bestmove = move
-                bestmoveline[0]=move
-                bestmovelineevals[0] = evall
+ 
             boardd.pop()
     
+    if printlogs: print("\n\n")
+    #if printlogs: print("LEGAL MOVES:",legalmoves,"EVALS:",allevals)
+    if printlogs: print("SENDING MOVE:",boardd.ply(),"eval:",alpha,'move:',bestmove)
 
-    if printlogs: print("SENDING MOVE:",boardd.ply(),"eval:",besteval,'move:',bestmove,'\n',file=log)
-    if printlogs: print("BESTMOVELINE:",bestmoveline,"EVALS:",bestmovelineevals)
     if bestmove != None:
         return bestmove
     else:
@@ -97,7 +96,8 @@ def rootsearch(boardd,depth):
 def alphabeta(boardd,zval,materialadv,depth,alpha,beta):
 
     if boardd.is_game_over():
-        return gameover(boardd)
+        evall = gameover(boardd)
+        return evall
 
     #cheking transtable
     global transtable
@@ -117,7 +117,8 @@ def alphabeta(boardd,zval,materialadv,depth,alpha,beta):
     
     #need table stuff pt 1
     if depth ==0:
-        quick = quiesce(boardd,zval,materialadv,alpha, beta )
+        #quick = quiesce(boardd,zval,materialadv,alpha, beta )
+        quick = evaluation(boardd,materialadv)
         return quick
 
     legalmoves = list(boardd.legal_moves)
@@ -134,8 +135,6 @@ def alphabeta(boardd,zval,materialadv,depth,alpha,beta):
             return beta
         if score > alpha:
             alpha = score;
-            bestmoveline[depthh-depth+1] = move
-            bestmovelineevals[depthh-depth+1] = score
         boardd.pop()
 
     transtable[zval%len(transtable)] = [zval,FEN,depth,alpha,legalmoves,evals]
@@ -143,6 +142,7 @@ def alphabeta(boardd,zval,materialadv,depth,alpha,beta):
 
 def quiesce(boardd,zval,materialadv,alpha,beta):
     
+    if printlogs: print("INSIDE QUIESCE. zval,material",zval,materialadv,file=log)
     table = transtable[zval%len(transtable)]
     FEN = boardd.fen()
     if not table == []:
@@ -151,6 +151,7 @@ def quiesce(boardd,zval,materialadv,alpha,beta):
                 print('ERROR:',table[1],":",FEN)
             else:
                 if table[2] <= -1:
+                    if printlogs: print("Quiesce: found table entry returning:",table[3],file=log)
                     return table[3]
                 else:
                     legalmoves = table[4]
@@ -158,8 +159,10 @@ def quiesce(boardd,zval,materialadv,alpha,beta):
     
     stand_pat = evaluation(boardd,materialadv)
     if stand_pat >= beta:
+        if printlogs: print("quiesce: found stand_pat:",stand_pat,">= beta:",beta,"returning beta",file=log)
         return beta
     if alpha < stand_pat:
+        if printlogs: print("quiesce: alpha:",alpha,"<",stand_pat,"alpha=stand_pat",file=log)
         alpha=stand_pat
     
     legalmoves = list(boardd.legal_moves)
@@ -170,12 +173,14 @@ def quiesce(boardd,zval,materialadv,alpha,beta):
         move = legalmoves[i]
         newzval,newmaterial = makezobristmoveandmaterial(boardd,move,zval,zarray,materialadv)
         if (boardd.is_capture(move) or boardd.gives_check(move)) and abs(newmaterial-materialadv)>alpha: #not sure about last part
+            if printlogs: print('quiesce: testing out next move:',move,file=logs)
             boardd.push(move)
             score = -quiesce(boardd,newzval,newmaterial,-beta,-alpha)
             evals.append(score)
             boardd.pop()
 
             if score >= beta:
+
                 return beta
             if score > alpha:
                 alpha=score
