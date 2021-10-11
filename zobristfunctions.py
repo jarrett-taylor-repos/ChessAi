@@ -44,12 +44,13 @@ def board2zobrist(boardd,zobristarray):
 
     return zhash
 
-def board2zobrist2(boardd,zobristarray):
+def board2zobrist2(boardd,zobristarray,piecesquarearray):
     #getting all pieces
     zhash = 0
     materialadv = 0
     materialvals = [1,3,3,5,9,0,-1,-3,-3,-5,-9,0]
     avgpawnrank = 0
+    piecesquareval = 0
     for i in range(64):
         piecetype = boardd.piece_type_at(i)
 
@@ -62,13 +63,16 @@ def board2zobrist2(boardd,zobristarray):
                 #increasing the row if the piece is black
             materialadv+=materialvals[piecetype-1]
             zhash = zhash^zobristarray[piecetype-1][i]
+            piecesquareval +=piecesquarearray[piecetype-1][i]
     if boardd.turn:
         zhash = zhash^zobristarray[12][0]
+
+
     for i in range(1,13):
         zhash = zhash^zobristarray[12][i]
     #for side to move
 
-    return zhash,materialadv
+    return zhash,materialadv,piecesquareval
 
 def makezobristmove(boardd,move,zval,zarray):
     fromsquare = move.from_square
@@ -193,7 +197,76 @@ def makezobristmoveandmaterial(boardd,move,zval,zarray,materialadv):
     
     return zval,materialadv
 
+def makezobristmove3(boardd,move,zval,zarray,materialadv,piecesqareval,piecesquarearray):
+    fromsquare = move.from_square
+    tosquare = move.to_square
+    piecemoving = boardd.piece_type_at(fromsquare)
+    color = boardd.color_at(fromsquare)
+    #color = boardd.turn
+    iscapture = boardd.is_capture(move)
+    iscastle = boardd.is_castling(move)
+    promotion = move.promotion
 
+    #removing piece from square it is on
+    if color:
+        zval=zval^zarray[piecemoving-1][fromsquare]
+        piecesqareval -= piecesquarearray[piecemoving-1][fromsquare]
+    else:
+        zval=zval^zarray[piecemoving+5][fromsquare]
+        piecesqareval -= piecesquarearray[piecemoving+5][fromsquare]
+    
+    if promotion != None:
+        piecemoving = promotion
+        
+    
+    #adding piece to new location
+    if color:
+        zval = zval^zarray[piecemoving-1][tosquare]
+        piecesqareval += piecesquarearray[piecemoving-1][tosquare]
+    else:
+        zval = zval^zarray[piecemoving+5][tosquare]
+        piecesqareval += piecesquarearray[piecemoving+5][tosquare]
+    
+    #is capture, remove old piece
+    capturevals = [1,3,3,5,9,200,-1,-3,-3,-5,-9,-200]
+    if iscapture:
+        if not boardd.is_en_passant(move):
+            removedpiece = boardd.piece_type_at(tosquare)
+            if color:
+                removedpiece = removedpiece+6
+            
+            zval = zval^zarray[removedpiece-1][tosquare]
+            materialadv -= capturevals[removedpiece-1]
+            piecesqareval -= piecesquarearray[removedpiece-1][tosquare]
+        else: #is enpassant
+            if not color:
+                removedpiece = 1
+                newtosquare = tosquare-8
+                materialadv +=1
+            else:
+                removedpiece = 7
+                newtosquare = tosquare+8
+                materialadv -=1
+            zval = zval^zarray[removedpiece-1][newtosquare]
+            piecesqareval -= piecesquarearray[removedpiece-1][newtosquare]
+
+    
+    if iscastle:
+        if color:
+            if boardd.is_kingside_castling(move):
+                zval = zval^zarray[3][7]^zarray[3][5]
+            else:
+                zval = zval^zarray[3][0]^zarray[3][3]
+        else:
+            if boardd.is_kingside_castling(move):
+                zval = zval^zarray[9][63]^zarray[9][61]
+            else:
+                zval = zval^zarray[9][56]^zarray[9][59]
+    
+    #for changing move
+    zval = zval^zarray[12][0]
+    
+    return zval,materialadv,piecesqareval
 
 
 
