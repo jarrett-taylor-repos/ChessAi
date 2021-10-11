@@ -206,7 +206,7 @@ def makezobristmove3(boardd,move,zval,zarray,materialadv,piecesqareval,piecesqua
     iscapture = boardd.is_capture(move)
     iscastle = boardd.is_castling(move)
     promotion = move.promotion
-
+    capturevals = [1,3,3,5,9,368,-1,-3,-3,-5,-9,-368]
     #removing piece from square it is on
     if color:
         zval=zval^zarray[piecemoving-1][fromsquare]
@@ -217,6 +217,10 @@ def makezobristmove3(boardd,move,zval,zarray,materialadv,piecesqareval,piecesqua
     
     if promotion != None:
         piecemoving = promotion
+        if color:
+            materialadv+=capturevals[piecemoving-1]-1
+        else:
+            materialadv+=capturevals[piecemoving+5]+1
         
     
     #adding piece to new location
@@ -228,7 +232,6 @@ def makezobristmove3(boardd,move,zval,zarray,materialadv,piecesqareval,piecesqua
         piecesqareval += piecesquarearray[piecemoving+5][tosquare]
     
     #is capture, remove old piece
-    capturevals = [1,3,3,5,9,200,-1,-3,-3,-5,-9,-200]
     if iscapture:
         if not boardd.is_en_passant(move):
             removedpiece = boardd.piece_type_at(tosquare)

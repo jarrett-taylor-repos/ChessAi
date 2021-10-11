@@ -11,7 +11,7 @@ from zobristfunctions import makezobrist,board2zobrist2,makezobristmove3,makezob
 from chessboard import display
 from piecesquaretables import alll
 printlogs = True
-depthh = 2
+depthh = 3
 #if printlogs: log = open('logs/log.txt','w')
 reader = chess.polyglot.open_reader("baron30.bin")
 
@@ -125,6 +125,7 @@ def rootsearch(boardd,depth):
 
 
 def alphabeta(boardd,zval,materialadv,piecesquareeval,depth,alpha,beta):
+    ogalpha = alpha
 
     evals = []
     if printlogs: movestack = boardd.move_stack
@@ -179,10 +180,11 @@ def alphabeta(boardd,zval,materialadv,piecesquareeval,depth,alpha,beta):
 
     if printlogs: print("LEAVING move:",boardd.ply(),"inside alphabeta, depth:",depth,"movestack:",movestack[len(movestack)-depthh+depth-1:len(movestack)],"eval:",alpha,file=log)
     if printlogs: print("legalmoves:",legalmoves,"evals:",evals,file=log)
-    transtable[zval%len(transtable)] = [zval,FEN,depth,alpha,legalmoves,evals]
+    if ogalpha != alpha: transtable[zval%len(transtable)] = [zval,FEN,depth,alpha,legalmoves,evals]
     return alpha
 
 def quiesce(boardd,zval,materialadv,piecesquareeval,alpha,beta):
+    ogalpha = alpha
     FEN = boardd.fen()
     global rootmove
     if printlogs: movestack = boardd.move_stack
@@ -238,7 +240,7 @@ def quiesce(boardd,zval,materialadv,piecesquareeval,alpha,beta):
                 alpha=score
 
     if printlogs: print("\tquiesce:",boardd.ply(),"leaving with score:",alpha,file=log)
-    transtable[zval%len(transtable)] = [zval,FEN,-1,alpha,legalmoves,evals]
+    if ogalpha != alpha: transtable[zval%len(transtable)] = [zval,FEN,-1,alpha,legalmoves,evals]
     return alpha
 
 def evaluation(boardd,materialadv,piecesquareeval):
@@ -281,14 +283,42 @@ def playselfgame():
     print(boardd.result())
 
 def continualgames():
-    for i in range(1):
+    while True:
         playselfgame()
+
+def testmove(FEN,depth):
+    printlogs=True
+    initialize()
+    board = chess.Board(FEN)
+    zval,materialadv,piecesquareval = board2zobrist2(board,zarray,alll)
+    print(materialadv)
+    global log
+    log = open("logtest.txt",'w')
+    move =(rootsearch(board,depth))
+    print(move)
+    newzval,newmaterial,newpiecesquareeval = makezobristmove3(board,move,zval,zarray,materialadv,piecesquareval,alll)
+    print(newmaterial)
 
 playselfgame()
 #continualgames()
 
-
-
+#testmove("r6k/8/8/8/8/8/p7/5R1K w - - 0 1",2)
+#testing
+'''
+initialize()
+board = chess.Board("r6k/8/8/8/8/8/p7/5R1K b - - 0 1")
+zval,materialadv,piecesquareval = board2zobrist2(board,zarray,alll)
+print(board)
+print('-')
+print(materialadv)
+move = chess.Move.from_uci("a2a1q")
+print(move)
+print(board.is_capture(move))
+newzval,newmaterial,newpiecesquareeval = makezobristmove3(board,move,zval,zarray,materialadv,piecesquareval,alll)
+print(newmaterial)
+board.push(move)
+print(board)
+'''
     
     
 

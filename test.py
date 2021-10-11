@@ -1,10 +1,12 @@
 from math import pi
+from re import A
 import chess
 import io
 import chess.pgn
 import chess.polyglot
 import random
-from zobristfunctions import makezobrist,board2zobrist,makezobristmove
+import time
+from zobristfunctions import makezobrist,board2zobrist,makezobristmove3
 
 
 #pgn = io.StringIO("1. e4 ")
@@ -18,8 +20,8 @@ game = chess.pgn.read_game(pgn)
 boardd = game.end().board()
 boardd = chess.Board()
 
-p = boardd.pieces(1,False)
-print(p)
-print('')
-print(p.mirror())
-print(chess.square_rank(list(p.mirror())[0]))
+boardd = chess.Board("6k1/p7/1p6/6N1/2P5/P7/2r2pPP/4R2K b - - 0 44")
+
+legalmoves = list(boardd.legal_moves)
+for i in range(len(legalmoves)):
+    print(legalmoves[i])
