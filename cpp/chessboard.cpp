@@ -5,6 +5,8 @@ class ChessBoard {
     private:
         Square chessboard[8][8];
         pair<stringSquare,stringSquare> moves[1000];
+        bool validmove[10000];
+        int validmovenumber;
         pair<Piece,Color> capturedPieces[1000];
         string allFENs[1000];
         int turnColor; // 0 is white, 1 is black
@@ -82,12 +84,17 @@ class ChessBoard {
 
 //constructors
 ChessBoard::ChessBoard(){ //WORKING
+        validmovenumber = 0;
         turnNum = 0;
         turnColor = 0;
 
         for(int i = 0; i < 1000; i++) {
             moves[i] = make_pair(MOVE, MOVE);
             allFENs[i] = "";
+        }
+
+        for(int i = 0; i < 10000; i++) {
+            validmove[i] = bool();
         }
 
         for(int y = 0; y < 8; y++) {
@@ -372,11 +379,17 @@ void ChessBoard::makeMove(stringSquare strstart, stringSquare strend) {
 
         if(futurecheck) {
             removeLastMove();
-            cout << "CAN'T MAKE THAT MOVE! Try another move." << endl;
+            validmove[validmovenumber] = false;
+            cout << "Future check - CAN'T MAKE THAT MOVE! Try another move." << endl;
+        } else {
+            validmove[validmovenumber] = true;
         }
     } else {
-        cout << "CAN'T MAKE THAT MOVE! Try another move." << endl;
+        validmove[validmovenumber] = false;
+        validmovenumber++;
+        cout << "Illegal piece move - CAN'T MAKE THAT MOVE! Try another move." << endl;
     }
+    validmovenumber++;
 }
 
 void ChessBoard::removeLastMove() {
@@ -521,7 +534,7 @@ vector<pair<stringSquare, stringSquare>> ChessBoard::getAllMoves() {
             }
         }
     }
-    cout << "moves size: " << all_moves.size() << endl;
+    //cout << "moves size: " << all_moves.size() << endl;
 
     return all_moves;
 }
@@ -586,7 +599,7 @@ vector<pair<stringSquare, stringSquare>> ChessBoard::getallLegalMoves() { //if t
         makeMove(move_start, move_end);
 
         bool futurecheck;
-        if(getColorfromTurn() == BLACK) {
+        if(getColorfromTurn() == WHITE) {
             futurecheck = isWhiteKingCheck();
         } else {
             futurecheck = isBlackKingCheck();

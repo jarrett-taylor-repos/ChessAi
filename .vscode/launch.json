@@ -30,6 +30,7 @@
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
+            "miDebuggerPath": "c:\\mingw\\bin\\gdb.exe",
             "stopAtEntry": false
         },
         {

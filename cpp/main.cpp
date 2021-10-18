@@ -11,9 +11,8 @@ int main() {
     cb.makeMove(f7, f5);
     cb.makeMove(d1, h5); //black in check, bishop working
     cb.printBoard();
-    //cb.makeMove(g8, f6); //says cant make this move
-    cb.makeMove(g7, g6); //only legal move
-    cb.printBoard();    
+    //cb.makeMove(g7, g6); //only legal move
+    //cb.printBoard();    
 
     // cb.makeMove(f2, f3);
     // cb.makeMove(e7, e6);
@@ -21,12 +20,15 @@ int main() {
     // cb.makeMove(d8, h4); //white in check, bishop working
     // cb.printBoard();
 
-    // vector<pair<stringSquare, stringSquare>> legalmoves = cb.getallLegalMoves();  //workign
-    // cout << legalmoves.size() << endl;
-    // for(int i = 0; i < legalmoves.size(); i++) {
-    //     cout << legalmoves[i].first << legalmoves[i].second << endl;
-    // }
-    
+    vector<pair<stringSquare, stringSquare>> legalmoves = cb.getallLegalMoves();  //pending
+    cout << legalmoves.size() << endl;
+    for(int i = 0; i < legalmoves.size(); i++) {
+        cout << legalmoves[i].first << legalmoves[i].second << endl;
+    }
+
+    cb.makeMove(g7, g6); //only legal move
+    cb.printBoard(); 
+        
 
 
 

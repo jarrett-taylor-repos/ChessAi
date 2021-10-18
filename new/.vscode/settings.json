@@ -1,9 +1,5 @@
 {
     "files.associations": {
-        "vector": "cpp",
-        "iostream": "cpp",
-        "ostream": "cpp",
-        "string_view": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -24,6 +20,7 @@
         "list": "cpp",
         "map": "cpp",
         "unordered_map": "cpp",
+        "vector": "cpp",
         "exception": "cpp",
         "algorithm": "cpp",
         "functional": "cpp",
@@ -34,19 +31,21 @@
         "optional": "cpp",
         "random": "cpp",
         "string": "cpp",
+        "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
         "initializer_list": "cpp",
         "iosfwd": "cpp",
+        "iostream": "cpp",
         "istream": "cpp",
         "limits": "cpp",
         "new": "cpp",
+        "ostream": "cpp",
         "ranges": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "Disabled"
+    }
 }
