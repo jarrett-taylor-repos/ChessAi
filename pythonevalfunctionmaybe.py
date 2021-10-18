@@ -6,6 +6,7 @@ from copy import deepcopy
 import random
 import chess.polyglot
 import time
+from zobristfunctions import makezobrist,board2zobrist,makezobristmove,makezobristmoveandmaterial
 
 printlogs = True
 
@@ -236,8 +237,62 @@ def evalpos(boardd):
         if printlogs: print("evalu after ispinned adjustment:",evalu,file=log)
         evalu += (avgwhitepawnrank-avgblackpawnrank)*30
         if printlogs: print("evalu after pawnforwardship adjustment:",evalu,file=log)
-        timespenteval += time.time()-t2
+        timespenteval += (time.time()-t2)
         return evalu
+
+def evalpos2(boardd,materialadv):
+
+    allwhitepawns = list(boardd.pieces(1,chess.WHITE))
+    allblackpawns = list(boardd.pieces(1,chess.BLACK).mirror())
+
+    avgwhitepawn = 0
+    avgblackpawn = 0
+    for i in range(len(allwhitepawns)):
+        avgwhitepawn += chess.square_rank(allwhitepawns[i])/len(allwhitepawns)
+
+    for i in range(len(allblackpawns)):
+        avgblackpawn += chess.square_rank(allblackpawns[i])/len(allblackpawns)
+
+
+    return materialadv*1000+avgwhitepawn*200-avgblackpawn*200
+    
+
+def Quiesce(boardd,materialadv,zval,alpha,beta):
+    global zarray
+    stand_pat = evalpos2(boardd,materialadv)
+    if( stand_pat >= beta ):
+        return beta
+    if( alpha < stand_pat ):
+        alpha = stand_pat;
+
+    alllegalmoves = list(boardd.legal_moves)
+    capturemoves = list()
+    for i in range(len(alllegalmoves)):
+        if boardd.is_capture(alllegalmoves[i]):
+            capturemoves.append(alllegalmoves[i])
+    
+    for i in range(len(capturemoves)):
+        newzval,newmaterialadv = makezobristmoveandmaterial(boardd,capturemoves[i],zval,zarray,materialadv)
+        boardd.push(capturemoves[i])
+        score = -Quiesce(boardd,newmaterialadv,newzval,-beta, -alpha)
+        boardd.pop()
+
+        if( score >= beta ):
+            return beta
+        if( score > alpha ):
+           alpha = score
+    
+    return alpha
+
+def gameover(boardd):
+    result = boardd.outcome().result()
+    if printlogs: print('found position results in game over', file=log)
+    if result == "1-0":
+        return 100000000
+    elif result == "0-1":
+        return -100000000
+    else:
+        return 0
 
 
 def sortmoves(boardd):
@@ -348,7 +403,6 @@ def pruning(boardd):
     
 
 
-
 def findsinglebestmove(boardd,depth,currentdepth=0,minormaxofabove=None):
     
     if depth==currentdepth:
@@ -434,8 +488,45 @@ def findsinglebestmove(boardd,depth,currentdepth=0,minormaxofabove=None):
         else:
             return min(bestmovenumberarray)
 
-def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999999):
+def findsinglebestmove2(boardd,depth,zval,currentdepth=0,alpha=-999999999,beta=999999999):
+    
+    ##testing transtable
+    t1 = time.time()
+    global time1
+    global time2
+    global time3
 
+    global transtable
+    table = transtable[zval%len(transtable)]
+    if len(table)>0 and not boardd.is_game_over():
+        if zval==table[0] and boardd.fen()[0:len(boardd.fen())-3]==table[1][0:len(table[1])-3]:
+            if boardd.fen()[0:len(boardd.fen())-3] != table[1][0:len(table[1])-3]:
+                print("ERROR: board:",boardd.fen(),"table:",table[1])
+            else:
+
+                if currentdepth == 0:
+                    if table[2] < 2:
+                        #remove thee below if later
+                        if not table[4] in list(boardd.legal_moves):
+                            print("HELP")
+                        else:
+                            #print('here1')
+                            return table[4]
+                elif currentdepth != 0 and currentdepth < depth:
+                    if table[2] <= currentdepth+1:
+                        #print('here2')
+                        return table[3]
+                elif currentdepth==depth:
+                    if table[2] <= currentdepth:
+                        #print('here3')
+                        return table[3]
+                else: #currentdepth>depth
+                    #print('here4')
+                    return table[3]
+            
+    time1+=time.time()-t1
+    t1 = time.time()
+    ##FINDING LEGAL MOVES
     if depth==currentdepth:
         legalmoves = list(boardd.legal_moves)
 
@@ -453,11 +544,13 @@ def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999
         
         for i in range(len(templegalmoves)):
             if boardd.is_capture(templegalmoves[i]) and (templegalmoves[i].from_square in squares or templegalmoves[i].to_square in squares):
-                legalmoves.append(templegalmoves[i])     
+                legalmoves.append(templegalmoves[i])   
+                
+        legalmoves = []
     else:
         #legalmoves = list(boardd.legal_moves)
         legalmoves = pruning(boardd)
-        legalmoves = pruning2(boardd,currentdepth)
+        #legalmoves = pruning2(boardd,currentdepth)
 
     if printlogs: print('at depth:',currentdepth,'alpha=',alpha,'beta=',beta,'fen:',boardd.fen(),'testing legal moves:',legalmoves,file=log)
 
@@ -465,24 +558,28 @@ def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999
     tempboard = boardd.copy()
     bestmovenumberarray = []
 
+
     if currentdepth > depth:
         
         bestmovenumberarray.append(evalpos(boardd))
         if printlogs: print('currentdepth>depth, bestmovenumberarray now:',bestmovenumberarray,file=log)
-    
+    time2+=time.time()-t1
+    t1 = time.time()
+
     #White move
     if boardd.turn:
         for i in range(len(legalmoves)):
             move = legalmoves[i]
             tempboard.push(move)
+            
 
             movestack = tempboard.move_stack
             if printlogs: print("testing tempboard: ",movestack[len(movestack)-currentdepth-1:len(movestack)],'FEN:',tempboard.fen(),file=log)            
-
+            newzval = makezobristmove(boardd,move,zval,zarray)
             if tempboard.is_game_over():
-                evalu = evalpos(tempboard)
+                evalu = evalpos(tempboard) 
             else:
-                evalu = findsinglebestmove2(tempboard,depth,currentdepth+1,alpha,beta)
+                evalu = findsinglebestmove2(tempboard,depth,newzval,currentdepth+1,alpha,beta)
 
             if printlogs: print('evaluation for tempboard: ',movestack[len(movestack)-currentdepth-1:len(movestack)],'is',evalu,file=log)   
             bestmovenumberarray.append(evalu)
@@ -494,16 +591,6 @@ def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999
             tempboard.pop()
         besteval = max(bestmovenumberarray)
         
-        if currentdepth != 0:
-            if printlogs: print('',file=log)
-            return besteval
-        else:
-            #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
-            #randomnum = random.randint(0,len(locationsofbest)-1)
-            #bestmove = legalmoves[locationsofbest[randomnum]] 
-            bestmove = legalmoves[bestmovenumberarray.index(besteval)]
-            if printlogs: print('SENDING MOVE:',boardd.ply(),':',bestmove,'with eval:',besteval,'bestmovenumberarray:',bestmovenumberarray,'legal moves:',legalmoves,file=log)
-            return bestmove
 
 
     #black move
@@ -511,16 +598,16 @@ def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999
         for i in range(len(legalmoves)):
             move = legalmoves[i]
             tempboard.push(move)
-
+            
             #logging
             movestack = tempboard.move_stack
             if printlogs: print("testing tempboard: ",movestack[len(movestack)-currentdepth-1:len(movestack)],file=log)
-
+            newzval = makezobristmove(boardd,move,zval,zarray)
 
             if tempboard.is_game_over():
                 evalu = evalpos(tempboard)
             else:
-                evalu = findsinglebestmove2(tempboard,depth,currentdepth+1,alpha,beta)
+                evalu = findsinglebestmove2(tempboard,depth,newzval,currentdepth+1,alpha,beta)
 
             if printlogs: print('evaluation for tempboard: ',movestack[len(movestack)-currentdepth-1:len(movestack)],'is',evalu,file=log)
             bestmovenumberarray.append(evalu)
@@ -533,28 +620,159 @@ def findsinglebestmove2(boardd,depth,currentdepth=0,alpha=-999999999,beta=999999
         
         besteval = min(bestmovenumberarray)
 
-        if currentdepth != 0:
-            return besteval
-        else:
-            #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
-            #randomnum = random.randint(0,len(locationsofbest)-1)
-            #bestmove = legalmoves[locationsofbest[randomnum]]
-            bestmove = legalmoves[bestmovenumberarray.index(besteval)]
-            if printlogs: print('found best move',boardd.ply(),':',bestmove,'with eval:',besteval,'bestmovenumberarray:',bestmovenumberarray,'legal moves:',legalmoves,file=log)
-            if printlogs: print('',file=log)
-            return bestmove
+    #sending to table.
+    if currentdepth>depth:
+        transtable[zval%len(transtable)] = [zval,boardd.fen(),currentdepth,besteval,[]]
+    else:
+        transtable[zval%len(transtable)] = [zval,boardd.fen(),currentdepth,besteval,legalmoves[bestmovenumberarray.index(besteval)]]
+    time3 += time.time()-t1
+    #sending up move
+    if currentdepth != 0:
+        return besteval
+    else:
+        #locationsofbest = [index for index, element in enumerate(bestmovenumberarray) if element == besteval]
+        #randomnum = random.randint(0,len(locationsofbest)-1)
+        #bestmove = legalmoves[locationsofbest[randomnum]]
+        bestmove = legalmoves[bestmovenumberarray.index(besteval)]
+        if printlogs: print('found best move',boardd.ply(),':',bestmove,'with eval:',besteval,'bestmovenumberarray:',bestmovenumberarray,'legal moves:',legalmoves,file=log)
+        if printlogs: print('',file=log)
+        return bestmove
 
+def findsinglebestmove3(boardd,depth,zval,materialadv=0,currentdepth=0,alpha=-999999999,beta=999999999):
 
+    #is game over
+    if boardd.is_game_over():
+        if printlogs: print('found game over,returning',file=log)
+        return boardd.peek(),gameover(boardd)
 
+    #turn and FEN
+    turn = boardd.turn
+    FEN = boardd.fen()
 
-
-
-
+    #printinglogs
+    movestack = boardd.move_stack
+    if printlogs:print("inside func, stack:",movestack[len(movestack)-currentdepth-1:len(movestack)],"materialadv:",materialadv,"FEN:",FEN,"depth:",currentdepth,file=log)
+    
 
 
     
+    #looking for previous analysis
+    oldlegal = []
+    legalmoves = []
+    global transtable
+    global gamezvals
+    global zarray
+    table = transtable[zval%len(transtable)]
+    if not table == []:
+        if table[0] == zval:
+            if not table[1][0:table[1].index(' ')]==FEN[0:FEN.index(' ')]:
+                print("ERROR: borad:",FEN,"t:",table[1])
 
-def playmove(boardd,nodee):
+            else:
+                #if depths are similar in analysis
+                if table[2] <= currentdepth: #maybe change 
+                    if printlogs:print('found table entry returning',table[3],table[4],file=log)
+                    return table[3],table[4]
+
+                else:
+                    oldlegal = table[5]
+                    previousevals = table[6]
+    
+    #AT DEPTH
+    if currentdepth==depth:
+        
+        evall = evalpos2(boardd,materialadv)
+        '''
+        if turn:
+            evall = Quiesce(boardd,materialadv,zval,alpha,beta)
+        else:
+            evall = Quiesce(boardd,materialadv,zval,-beta,-alpha)
+        '''
+        if printlogs:print("at depth, returning with eval:",evall,file=log)
+        transtable[zval%len(transtable)] = [zval,boardd.fen(),currentdepth,None,evall,[],[]]
+        return None,evall
+
+    #ORDERING MOVES: TODO
+    if oldlegal==[]:
+        legalmoves = list(boardd.legal_moves)
+
+        for move in legalmoves:
+            z = makezobristmove(boardd,move,zval,zarray)
+            if z in gamezvals:
+                legalmoves.pop(legalmoves.index(move))
+        #add ordering stuff?
+    else:
+        
+        #previous alpha or betacutoff
+        if len(previousevals)<len(oldlegal):
+            breaker = len(previousevals)-1
+            legalmoves.append(oldlegal[breaker])
+            oldlegal.pop(breaker)
+            previousevals.pop(breaker)
+        
+        for i in range(len(previousevals)):
+            if turn:
+                besteval = previousevals.index(max(previousevals))
+            else:
+                besteval = previousevals.index(min(previousevals))
+            
+            legalmoves.append(oldlegal[besteval])
+            oldlegal.pop(besteval)
+            previousevals.pop(besteval)
+        
+        #adding moves that didn't get eval
+        for i in range(len(oldlegal)):
+            legalmoves.append(oldlegal[i])
+    
+    tempboard = boardd.copy()
+    bestmovearray = []
+
+    for i in range(len(legalmoves)):
+        move = legalmoves[i]
+        tempboard.push(move)
+        newzval,newmaterialadv = makezobristmoveandmaterial(boardd,move,zval,zarray,materialadv)
+
+            
+
+        movething,evall = findsinglebestmove3(tempboard,depth,newzval,newmaterialadv,currentdepth+1,alpha,beta)
+
+        if turn:
+            bestmovearray.append(evall)
+            if evall>=beta:
+                break
+            alpha = max(bestmovearray)
+        else:
+            bestmovearray.append(evall)
+            if evall<=alpha:
+                break
+            beta = min(bestmovearray)
+    
+        tempboard.pop()
+
+    if turn:
+        bestval = max(bestmovearray)
+    else:
+        bestval = min(bestmovearray)
+    bestmove = legalmoves[bestmovearray.index(bestval)]
+    transtable[zval%len(transtable)] = [zval,FEN,currentdepth,bestmove,bestval,legalmoves,bestmovearray]
+
+
+
+    return bestmove,bestval
+    
+
+    
+
+def playmove(boardd,nodee,zval):
+    global totalevals
+    global timespenteval
+
+    global time1
+    global time2 
+    global time3
+    time1 = 0
+    time2 = 0
+    time3 = 0
     totalevals = 0
     totalbreaks = 0
     totaltime = 0
@@ -568,15 +786,33 @@ def playmove(boardd,nodee):
         print('doingbookmove')
     else:
         #bestmove = (findsinglebestmove(boardd,2))
-        bestmove = findsinglebestmove2(boardd,2)
+        #bestmove = findsinglebestmove2(boardd,3,zval)
+        materialadv = materialadvantagecalc(boardd.fen())
+        bestmove,evall = findsinglebestmove3(boardd,2,zval,materialadv)
+        if printlogs: print("SENDING MOVE",boardd.ply(),":",bestmove,file=log)
         nodee = nodee.add_variation(bestmove)
-        
+    
+    zval = makezobristmove(boardd,bestmove,zval,zarray)
+    gamezvals.append(zval)
     boardd.push(bestmove)
     if printlogs: print(boardd,file=log)
     if printlogs: print('------------------',file=log)
-    return boardd,nodee
-    #print(totalbreaks,totalevals,time.time()-t,timespenteval,time.time()-t-timespenteval)
+    print(totalevals,time.time()-t,timespenteval,time.time()-t-timespenteval)
+    print(timespenteval)
+    print(time1,time2,time3)
+    return boardd,nodee,zval
+ 
 
+def initialize():
+    global zarray
+    global transtable
+    global gamezvals
+
+    gamezvals = []
+
+    zarray = makezobrist()
+    transtable = [[] for i in range(10000000)]
+    print(len(transtable))
 
 #def playgame(materialadvmult,attacksmult,pinnedmult,pawnranksmult):
     #bmaterial
@@ -595,9 +831,15 @@ for i in range(1):
     node = game
     movenum = 0
 
+    #zobrist stuff
+    initialize()
+    global zarray
+    zval = board2zobrist(board4,zarray)
+
+
     while not board4.is_game_over():
         movenum +=1
-        board4,node = playmove(board4,node)
+        board4,node,zval = playmove(board4,node,zval)
         print(game)
         print('')
         print(game,file=log2)
