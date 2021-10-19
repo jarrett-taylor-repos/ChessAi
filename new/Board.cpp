@@ -19,8 +19,8 @@ class Board {
         Board();
         void loadFEN(string fen);
 
-        bool* canWhiteCastle(); //add check logic with sqaure attacked
-        bool* canBlackCastle(); 
+        vector<bool> canWhiteCastle();
+        vector<bool> canBlackCastle(); 
 
         void setMoveColor();
 
@@ -60,7 +60,7 @@ class Board {
 
         Square* getSquare(Piece p, Color c);
         Square* getSquare(Notation c);
-        Square* getSquare(int x, int y);
+        Square* getSquare(int x, int y);//add in promo square
         Notation getNotation(int, int);
 
         string moveToChess(Notation start, Notation end);//used for pgn 
@@ -320,7 +320,16 @@ bool Board::makeMove(Notation start, Notation end) {
     //cout << "moveColor: " << moveColor << endl;
     //if can make move return true and make move
     Square* sqstart = getSquare(start);
-    Square* sqend = getSquare(end);
+    Square* sqend;
+    string notToString =  notationToString(end);
+    if(notToString.length() == 3) {
+        notToString.pop_back();
+        Notation promo = stringToNotation(notToString);
+        sqend = getSquare(promo);
+    } else {
+        Square* sqend = getSquare(end);
+    }
+    
     bool rightColor = sqstart->getColor() == moveColor;
     vectorGetAllLegalMoves = getAllMoves();
     cout << "allmoves size: " << vectorGetAllLegalMoves.size() << endl;
@@ -390,8 +399,8 @@ bool Board::makeMove(Notation start, Notation end) {
                 } else {
                     Square* f8sqaure = getSquare(f8);
                     Square* h8sqaure = getSquare(h8);
-                    sqend->setPieceandColor(KING, WHITE);
-                    f8sqaure->setPieceandColor(ROOK, WHITE);
+                    sqend->setPieceandColor(KING, BLACK);
+                    f8sqaure->setPieceandColor(ROOK, BLACK);
                     sqstart->setEmpty();
                     h8sqaure->setEmpty();
                 }
@@ -627,7 +636,7 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
 
     //castling
     if(moveColor == WHITE) {
-        bool *castle = canWhiteCastle();
+        vector<bool> castle = canWhiteCastle();
         if(castle[0]) {
             pairs.push_back(make_pair(-2, 0));
         }
@@ -635,7 +644,7 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
             pairs.push_back(make_pair(2, 0));
         }
     } else {
-        bool *castle = canBlackCastle();
+        vector<bool> castle = canBlackCastle();
         if(castle[0]) {
             pairs.push_back(make_pair(-2, 0));
         }
@@ -649,13 +658,11 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
         pair<int, int> temp = movetHelper(x+pairs[i].first, y+pairs[i].second, sq);
         if(temp.first != -1) {
             Square* end = getSquare(temp.first, temp.second);
-            setMoveColor();
             bool notFutureCheck = isSquareAttack(end).size() == 0;
             if(notFutureCheck) {
                 pair<Square*, Square*> add = make_pair(sq, end);
                 kings.push_back(add);
             }
-            setMoveColor();
         }
     }
     //coutTab(4);
@@ -926,7 +933,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
             Square* enpassantSquare = getSquare(enpassantTarget);
             int enpassantSquare_x = enpassantSquare->getx();
             int enpassantSquare_y = enpassantSquare->gety();
-            bool goodx = abs(enpassantSquare_x-x) == 0;
+            bool goodx = abs(enpassantSquare_x-x) == 1;
             bool goody = enpassantSquare_y-y == -1;
             if(goodx && goody) {
                 pawns.push_back(make_pair(pawn, enpassantSquare));
@@ -983,7 +990,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
             Square* enpassantSquare = getSquare(enpassantTarget);
             int enpassantSquare_x = enpassantSquare->getx();
             int enpassantSquare_y = enpassantSquare->gety();
-            bool goodx = abs(enpassantSquare_x-x) == 0;
+            bool goodx = abs(enpassantSquare_x-x) == 1;
             bool goody = enpassantSquare_y-y == 1;
             if(goodx && goody) {
                 pawns.push_back(make_pair(pawn, enpassantSquare));
@@ -1003,16 +1010,17 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
 
 Square* Board::getKing(Color c) {
+    Square* king;
     Square* temp;
     for(int i = 0; i < 8; i++) {
         for(int j = 0; j < 8; j++) {
             temp = getSquare(i, j);
             if(temp->getColor() == c && temp->getPiece() == KING) {
-                break;
+                king = temp;
             }
         }
     }
-    return temp;
+    return king;
 }
 
 
@@ -1090,6 +1098,7 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
             } else {
                 //coutTab(2);
                 //cout << "attackers, but not protecting king" << endl;
+                legalmoves = getPieceMoves(s);
                 returnthis = make_pair(false, legalmoves);
             }
         }
@@ -1097,8 +1106,8 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
         //coutTab(2);
         //cout << "no attackers" << endl;
         legalmoves = getPieceMoves(s);
+        returnthis = make_pair(false, legalmoves);
     }
-    returnthis = make_pair(false, legalmoves);
     //coutTab(2);
     //cout << "returnthis: " << returnthis.first << ", " << returnthis.second.size() << endl;
     return returnthis;
@@ -1129,10 +1138,10 @@ vector<pair<int,int>> Board::isInCheck() {
     return checks;
 }
 
-bool* Board::canWhiteCastle() {
-    bool *longshort = new bool[2];
-    longshort[0] = false;
-    longshort[1] = false;
+vector<bool> Board::canWhiteCastle() {
+    vector<bool> longshort;
+    longshort.push_back(false);
+    longshort.push_back(false);
     bool a1 = white_a1Kh1[0];
     bool king = white_a1Kh1[1];
     bool h1 = white_a1Kh1[2];
@@ -1156,20 +1165,20 @@ bool* Board::canWhiteCastle() {
         isSquareAttack(getSquare(c1)).size() == 0;
 
     if(a1 && king && wKQ_bkq[0] && no_checks_short && emptysquare_short) {
-        longshort[0] = true;
+        longshort[1] = true;
     }
 
     if(h1 && king && wKQ_bkq[1] && no_checks_long && emptysquare_long) {
-        longshort[1] = true;
+        longshort[0] = true;
     }
 
     return longshort;
 }
 
-bool* Board::canBlackCastle() {
-    bool *longshort = new bool[2];
-    longshort[0] = false;
-    longshort[1] = false;
+vector<bool> Board::canBlackCastle() {
+    vector<bool> longshort;
+    longshort.push_back(false);
+    longshort.push_back(false);
     bool a8 = black_a8kh8[0];
     bool king = black_a8kh8[1];
     bool h8 = black_a8kh8[2];
@@ -1193,11 +1202,11 @@ bool* Board::canBlackCastle() {
         isSquareAttack(getSquare(c8)).size() == 0;
 
     if(a8 && king && wKQ_bkq[2] && no_checks_short && emptysquare_short) {
-        longshort[0] = true;
+        longshort[1] = true;
     }
 
     if(h8 && king && wKQ_bkq[3] && no_checks_long && emptysquare_long) {
-        longshort[1] = true;
+        longshort[0] = true;
     }
 
     return longshort;
@@ -1310,28 +1319,8 @@ vector<pair<int,int>> Board::isRookAttacker(Square*square) {
     int y = square->gety();
     vector<pair<int, int>> pairs;
 
-    //left
-    for(int i = x; i < 8; i++) {
-        int tempx = i;
-        int tempy = y;
-        Square* temp = getSquare(tempx, tempy);
-        if(temp->getColor() == moveColor) {
-            break;
-        } else if(temp->getColor() != NONE && temp->getColor() != moveColor) {
-            pair<int, int> newpair = make_pair(tempx, tempy);
-            pairs.push_back(newpair);
-            break;
-        } else {
-            pair<int, int> newpair = make_pair(tempx, tempy);
-            pairs.push_back(newpair);
-        }
-    }
-
-    x = square->getx();
-    y = square->gety();
-
     //right
-    for(int i = x; i >= 0; i--) {
+    for(int i = x+1; i < 8; i++) {
         int tempx = i;
         int tempy = y;
         Square* temp = getSquare(tempx, tempy);
@@ -1347,11 +1336,25 @@ vector<pair<int,int>> Board::isRookAttacker(Square*square) {
         }
     }
 
-    x = square->getx();
-    y = square->gety();
+    //left
+    for(int i = x-1; i >= 0; i--) {
+        int tempx = i;
+        int tempy = y;
+        Square* temp = getSquare(tempx, tempy);
+        if(temp->getColor() == moveColor) {
+            break;
+        } else if(temp->getColor() != NONE && temp->getColor() != moveColor) {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+            break;
+        } else {
+            pair<int, int> newpair = make_pair(tempx, tempy);
+            pairs.push_back(newpair);
+        }
+    }
 
     //up
-    for(int i = y; i >= 0; i--) {
+    for(int i = y-1; i >= 0; i--) {
         int tempx = x;
         int tempy = i;
         Square* temp = getSquare(tempx, tempy);
@@ -1367,10 +1370,8 @@ vector<pair<int,int>> Board::isRookAttacker(Square*square) {
         }
     }
 
-    x = square->getx();
-    y = square->gety();
     //down
-    for(int i = y; i < 8; i++) {
+    for(int i = y+1; i < 8; i++) {
         int tempx = x;
         int tempy = i;
         Square* temp = getSquare(tempx, tempy);
