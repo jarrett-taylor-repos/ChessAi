@@ -1293,7 +1293,7 @@ vector<pair<int,int>> Board::isBishopAttacker(Square*s) {
     }
 
     vector<pair<int, int>> attackers;
-    for(int i = 1; i < pairs.size(); i++) {
+    for(int i = 0; i < pairs.size(); i++) {
         int tempx = pairs[i].first;
         int tempy = pairs[i].second;
         Square* temp = getSquare(tempx, tempy);
@@ -1387,7 +1387,7 @@ vector<pair<int,int>> Board::isRookAttacker(Square*square) {
     }
 
     vector<pair<int, int>> attackers;
-    for(int i = 1; i < pairs.size(); i++) {
+    for(int i = 0; i < pairs.size(); i++) {
         int tempx = pairs[i].first;
         int tempy = pairs[i].second;
         Square* temp = getSquare(tempx, tempy);
