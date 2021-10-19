@@ -332,7 +332,7 @@ bool Board::makeMove(Notation start, Notation end) {
     
     bool rightColor = sqstart->getColor() == moveColor;
     vectorGetAllLegalMoves = getAllMoves();
-    cout << "allmoves size: " << vectorGetAllLegalMoves.size() << endl;
+    //cout << "allmoves size: " << vectorGetAllLegalMoves.size() << endl;
     bool gameOver = isGameOver();
     bool legalmove = false;
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
@@ -1545,6 +1545,14 @@ vector<pair<int,int>> Board::isSquareAttack(Square*s) {
 
 void Board::print() {
     cout <<"-------------"<< endl;
+    if(isCheckmate()) {
+        cout << "CHECKMATE" << endl;
+    } else if (isDraw()) {
+        cout << "DRAW" << endl;
+    } 
+    else {
+        cout << moveColor << " to move." << endl;
+    }
     for(int y = 0; y < 8; y++) {
         for(int x = 0; x < 8; x++) {
             board[x][y].printSquare();
