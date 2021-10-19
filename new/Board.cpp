@@ -207,6 +207,7 @@ void Board::loadFEN(string fen) {
             //useless
         }
     }
+    vectorGetAllLegalMoves = getAllMoves();
 }
 
 bool Board::isGameOver() {
@@ -220,7 +221,6 @@ bool Board::isCheckmate() {
     //see if no moves and in check
     bool checkmate = false;
     if(vectorGetAllLegalMoves.size() == 0 && isInCheck().size() == 1) {
-        cout << "checkmate" << endl;
         checkmate = true;
     }
     //cout << "checkmate: " << checkmate << endl;
@@ -231,24 +231,24 @@ bool Board::isDraw() {
     //need to if no moves and not in check
     bool draw = false;
     if(vectorGetAllLegalMoves.size() == 0 && isInCheck().size() == 0) {
-        cout << "no legal moves" << endl;
+        //cout << "stalemate" << endl;
         draw = true;
     }
     //need to see if 50 move rule
     if(halfTurnNum == 100) {
-        cout << "50moverule" << endl;
+        //cout << "50moverule" << endl;
         draw = true;
     }
     //need to see if same pgn string 3 times
     bool repdraw = repitionDraw();
     if(repdraw) {
-        cout << "repdraw" << endl;
+        //cout << "repdraw" << endl;
         draw = true;
     }
     //need to see if cant mate, thus draw
     bool noforcedmate = noForcedMateDraw();
     if(noforcedmate) {
-        cout << "noforcedmate" << endl;
+        //cout << "noforcedmate" << endl;
         draw = true;
     }
     //cout << "draw: " << draw << endl;
@@ -334,6 +334,9 @@ bool Board::makeMove(Notation start, Notation end) {
     vectorGetAllLegalMoves = getAllMoves();
     //cout << "allmoves size: " << vectorGetAllLegalMoves.size() << endl;
     bool gameOver = isGameOver();
+    if(!vectorGetAllLegalMoves.size()) {
+        return false;
+    }
     bool legalmove = false;
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
         Square* teststart = vectorGetAllLegalMoves[i].first;
