@@ -11,10 +11,10 @@ int main() {
     // b.makeMoveAndPrint(f3, f7);
     // b.makeMoveAndPrint(a8, b8);//should be checkmate
 
-    // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
-    // b.loadFEN(pinnedmoves);
-    // b.print();
-    // b.makeMoveAndPrint(e7, e6);
+    string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
+    b.loadFEN(pinnedmoves);
+    b.print();
+    b.makeMoveAndPrint(e7, e6);
 
     // string enpassm = "rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
     // b.loadFEN(enpassm);

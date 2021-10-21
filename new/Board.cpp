@@ -19,6 +19,8 @@ class Board {
         Board();
         void loadFEN(string fen);
 
+        Color getMoveColor();
+
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
 
@@ -128,6 +130,10 @@ Board::Board() {
     }
 }
 
+Color Board::getMoveColor() {
+    return moveColor;
+}
+
 void Board::setMoveColor() {
     if(moveColor == WHITE) {
         moveColor = BLACK;
@@ -211,47 +217,32 @@ void Board::loadFEN(string fen) {
 }
 
 bool Board::isGameOver() {
-    //cout << "isGameOver()" << endl;
     bool game = isCheckmate() || isDraw();
-    //cout << "game is over: " << game << endl;
     return game;
 }
 bool Board::isCheckmate() {
-    //cout << "isCheckmate()" << endl;
-    //see if no moves and in check
     bool checkmate = false;
     if(vectorGetAllLegalMoves.size() == 0 && isInCheck().size() == 1) {
         checkmate = true;
     }
-    //cout << "checkmate: " << checkmate << endl;
     return checkmate;
 }     
 bool Board::isDraw() {
-    //cout << "isDraw()" << endl;
-    //need to if no moves and not in check
     bool draw = false;
     if(vectorGetAllLegalMoves.size() == 0 && isInCheck().size() == 0) {
-        //cout << "stalemate" << endl;
         draw = true;
     }
-    //need to see if 50 move rule
     if(halfTurnNum == 100) {
-        //cout << "50moverule" << endl;
         draw = true;
     }
-    //need to see if same pgn string 3 times
     bool repdraw = repitionDraw();
     if(repdraw) {
-        //cout << "repdraw" << endl;
         draw = true;
     }
-    //need to see if cant mate, thus draw
     bool noforcedmate = noForcedMateDraw();
     if(noforcedmate) {
-        //cout << "noforcedmate" << endl;
         draw = true;
     }
-    //cout << "draw: " << draw << endl;
     return draw;
 }
 bool Board::repitionDraw() {
@@ -416,6 +407,9 @@ bool Board::makeMove(Notation start, Notation end) {
             takenpawn->setEmpty();
         } else if(promotion) {
             pawnmove=true;
+            if(sqend->getPiece() != EMPTY) {
+                capture = true;
+            }
             Piece promoPiece = getPawnPromotion(end);
             sqend->setPieceandColor(promoPiece, sqstart->getColor());
             sqstart->setEmpty();
