@@ -1542,19 +1542,29 @@ vector<pair<int,int>> Board::isSquareAttack(Square*s) {
     
     vector<pair<int,int>> all;
     for(int i = 0; i < bishops.size(); i++) {
-        all.push_back(bishops[i]);
+        if(isInRange(bishops[i].first, bishops[i].second)) {
+            all.push_back(bishops[i]);
+        }
     }
     for(int i = 0; i < rooks.size(); i++) {
-        all.push_back(rooks[i]);
+        if(isInRange(rooks[i].first, rooks[i].second)) {
+            all.push_back(rooks[i]);
+        }
     }
     for(int i = 0; i < knights.size(); i++) {
-        all.push_back(knights[i]);
+        if(isInRange(knights[i].first, knights[i].second)) {
+            all.push_back(knights[i]);
+        }
     }
     for(int i = 0; i < pawns.size(); i++) {
-        all.push_back(pawns[i]);
+        if(isInRange(pawns[i].first, pawns[i].second)) {
+            all.push_back(pawns[i]);
+        }
     }
     for(int i = 0; i < kings.size(); i++) {
-        all.push_back(kings[i]);
+        if(isInRange(kings[i].first, kings[i].second)) {
+            all.push_back(kings[i]);
+        }
     }
     //coutTab(5);
     //cout << "attackers size: "<< all.size() << endl;

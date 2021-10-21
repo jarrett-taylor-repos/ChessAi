@@ -44,6 +44,6 @@ int main() {
     // b.makeMoveAndPrint(e8, d8);
 
     Board test;
-    vector<pair<Notation, Notation>> vectormovesnotation = test.getAllMovesVector();
-    test.makeMoveAndPrint(g2, f3);
+    test.loadFEN("rnbqkbnr/1ppppppp/p7/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 2");
+    test.makeMoveAndPrint(d6, d5);
 }
