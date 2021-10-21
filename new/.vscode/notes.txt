@@ -7,4 +7,8 @@ Zobrist functionality
 Create private variables
     -to get items once to no recall
 
-who won
+isGameOver
+    -return who won
+
+Notation 
+    -add promorion sqaures for get x and get y functionality

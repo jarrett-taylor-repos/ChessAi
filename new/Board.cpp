@@ -340,7 +340,7 @@ bool Board::makeMove(Notation start, Notation end) {
         Notation promo = stringToNotation(notToString);
         sqend = getSquare(promo);
     } else {
-        Square* sqend = getSquare(end);
+        sqend = getSquare(end);
     }
     
     bool rightColor = sqstart->getColor() == moveColor;
