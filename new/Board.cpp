@@ -139,7 +139,7 @@ Color Board::getMoveColor() {
 
 vector<pair<Notation, Notation>> Board::getAllMovesVector() {
     vector<pair<Notation, Notation>> moves;
-    for(i = 0; i < vectorGetAllLegalMoves.size(); i++) {
+    for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
         pair<Square*, Square*> pairSq = vectorGetAllLegalMoves[i];
         Square* sq1 = pairSq.first;
         int sq1x = sq1->gety();
