@@ -1,0 +1,12 @@
+Castling
+    -improve code to not have white_a1Kh1[] or black_a8kh8[] boolean arrays
+
+Zobrist functionality
+    -create functions to easy integrate Zobrist, determine if capture or promotion and give following details for improved performace
+
+Create private variables
+    -to get items once to no recall
+
+getturn
+
+who won
