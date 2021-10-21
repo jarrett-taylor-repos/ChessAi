@@ -131,6 +131,7 @@ Board::Board() {
 
     }
     vectorGetAllLegalMoves = getAllMoves();
+    vectorGetNotationMoves = getAllMovesVector();
 }
 
 Color Board::getMoveColor() {
@@ -236,6 +237,7 @@ void Board::loadFEN(string fen) {
         }
     }
     vectorGetAllLegalMoves = getAllMoves();
+    vectorGetNotationMoves = getAllMovesVector();
 }
 
 bool Board::isGameOver() {
@@ -332,6 +334,7 @@ bool Board::makeMove(Notation start, Notation end) {
     //cout << "makeMove()" << endl;
     //cout << "moveColor: " << moveColor << endl;
     //if can make move return true and make move
+    bool move_made = false;
     Square* sqstart = getSquare(start);
     Square* sqend;
     string notToString =  notationToString(end);
@@ -345,10 +348,11 @@ bool Board::makeMove(Notation start, Notation end) {
     
     bool rightColor = sqstart->getColor() == moveColor;
     vectorGetAllLegalMoves = getAllMoves();
+    vectorGetNotationMoves = getAllMovesVector();
     //cout << "allmoves size: " << vectorGetAllLegalMoves.size() << endl;
     bool gameOver = isGameOver();
     if(!vectorGetAllLegalMoves.size()) {
-        return false;
+        move_made = false;
     }
     bool legalmove = false;
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
@@ -482,10 +486,13 @@ bool Board::makeMove(Notation start, Notation end) {
         }
         turnNum++;
     } else {
-        return false;
+        move_made = false;
     }
-
-    return true;
+    
+    vectorGetAllLegalMoves = getAllMoves();
+    vectorGetNotationMoves = getAllMovesVector();
+    move_made = true;
+    return move_made;
 }
 
 Piece Board::getPawnPromotion(Notation n){
