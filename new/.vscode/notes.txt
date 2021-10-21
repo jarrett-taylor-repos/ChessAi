@@ -7,6 +7,4 @@ Zobrist functionality
 Create private variables
     -to get items once to no recall
 
-getturn
-
 who won

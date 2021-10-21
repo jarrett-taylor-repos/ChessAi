@@ -20,6 +20,7 @@ class Board {
         void loadFEN(string fen);
 
         Color getMoveColor();
+        vector<pair<Square*, Square*>> getAllMovesVector();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
@@ -128,10 +129,15 @@ Board::Board() {
         board[i][6].setPieceandColor(PAWN, WHITE);
 
     }
+    vectorGetAllLegalMoves = getAllMoves();
 }
 
 Color Board::getMoveColor() {
     return moveColor;
+}
+
+vector<pair<Square*, Square*>> Board::getAllMovesVector() {
+    return vectorGetAllLegalMoves;
 }
 
 void Board::setMoveColor() {
