@@ -142,10 +142,10 @@ vector<pair<Notation, Notation>> Board::getAllMovesVector() {
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
         pair<Square*, Square*> pairSq = vectorGetAllLegalMoves[i];
         Square* sq1 = pairSq.first;
-        int sq1x = sq1->gety();
+        int sq1x = sq1->getx();
         int sq1y = sq1->gety();
         Square* sq2 = pairSq.second;
-        int sq2x = sq2->gety();
+        int sq2x = sq2->getx();
         int sq2y = sq2->gety();
 
         Notation not_sq1 = getNotation(sq1x, sq1y);
