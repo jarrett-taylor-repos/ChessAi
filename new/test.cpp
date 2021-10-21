@@ -61,9 +61,10 @@ pair<Notation, Notation> rootsearch(Board b){
     for(int i = 0; i < allmoves.size(); i++) {
         Notation n1 = allmoves[i].first;
         Notation n2 = allmoves[i].second;
-        //cout<<"testing:"<<n1<<n2<<endl;
+        cout<<"testing:"<<n1<<n2<<"ogFEN:"<<b.getFEN()<<endl;
+        string FEN = b.getFEN();
         Board b2;
-        b2.loadFEN(b.getFEN());
+        b2.loadFEN(FEN);
         b2.makeMove(n1,n2);
         
         //make move
@@ -81,9 +82,10 @@ int playgame(){
     cout << b.getFEN();
     while (!b.isGameOver()){
         pair<Notation, Notation> move = rootsearch(b);
+        cout<<"FOUND MOVE";
         cout<<move.first<<move.second<<endl;
-        b.makeMove(move.first,move.second);
-        b.print();
+        b.makeMoveAndPrint(move.first,move.second);
+        //b.print();
         cout << b.getFEN()<<endl<<endl<<endl;
     }
     return 0;
