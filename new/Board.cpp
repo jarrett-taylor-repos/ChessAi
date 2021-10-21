@@ -14,13 +14,14 @@ class Board {
         bool white_a1Kh1[3]; //0 means moved piece
         bool black_a8kh8[3]; //0 means moved piece
 
-        vector<pair<Square*, Square*>> vectorGetAllLegalMoves;        
+        vector<pair<Square*, Square*>> vectorGetAllLegalMoves; 
+        vector<pair<Notation, Notation>> vectorGetNotationMoves;        
     public:
         Board();
         void loadFEN(string fen);
 
         Color getMoveColor();
-        vector<pair<Square*, Square*>> getAllMovesVector();
+        vector<pair<Notation, Notation>> getAllMovesVector();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
@@ -136,8 +137,23 @@ Color Board::getMoveColor() {
     return moveColor;
 }
 
-vector<pair<Square*, Square*>> Board::getAllMovesVector() {
-    return vectorGetAllLegalMoves;
+vector<pair<Notation, Notation>> Board::getAllMovesVector() {
+    vector<pair<Notation, Notation>> moves;
+    for(i = 0; i < vectorGetAllLegalMoves.size(); i++) {
+        pair<Square*, Square*> pairSq = vectorGetAllLegalMoves[i];
+        Square* sq1 = pairSq.first;
+        int sq1x = sq1->gety();
+        int sq1y = sq1->gety();
+        Square* sq2 = pairSq.second;
+        int sq2x = sq2->gety();
+        int sq2y = sq2->gety();
+
+        Notation not_sq1 = getNotation(sq1x, sq1y);
+        Notation not_sq2 = getNotation(sq2x, sq2y);
+        pair<Notation, Notation> pairNot = make_pair(not_sq1, not_sq2);
+        moves.push_back(pairNot);
+    }
+    return moves;
 }
 
 void Board::setMoveColor() {
