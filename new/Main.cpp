@@ -1,5 +1,7 @@
 #include "Board.cpp"
 
+
+
 int main() {
     Board b;
     // b.makeMoveAndPrint(e2, e4);
@@ -27,11 +29,11 @@ int main() {
     // b.makeMoveAndPrint(e1, g1);
     // b.makeMoveAndPrint(e8, g8);
 
-    // string promo = "rnbq1rk1/ppP1ppbp/5np1/8/8/5NP1/P1pPPPBP/RNBQ1RK1 w - - 0 9";
-    // b.loadFEN(promo);
-    // b.print();
-    // b.makeMoveAndPrint(c7, d8Q);
-    // b.makeMoveAndPrint(c2, d1q);
+    string promo = "rnbq1rk1/ppP1ppbp/5np1/8/8/5NP1/P1pPPPBP/RNBQ1RK1 w - - 0 9";
+    b.loadFEN(promo);
+    b.print();
+    b.makeMoveAndPrint(c7, d8Q);
+    b.makeMoveAndPrint(c2, d1q);
 
     // string stalemate = "4k3/4p3/4Q3/3R1R2/8/8/PPPPPPPP/1NB1KBN1 b - - 0 1";
     // b.loadFEN(stalemate);
@@ -43,7 +45,8 @@ int main() {
     // b.print();
     // b.makeMoveAndPrint(e8, d8);
 
-    Board test;
-    test.loadFEN("rnbqkbnr/1ppppppp/p7/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 2");
-    test.makeMoveAndPrint(d6, d5);
+    // Board test;
+    // test.loadFEN("rnbqkbnr/1ppppppp/p7/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 2");
+    // test.makeMoveAndPrint(d6, d5);
+    print_map(b.getfenMap());
 }

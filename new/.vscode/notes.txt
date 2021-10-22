@@ -4,11 +4,5 @@ Castling
 Zobrist functionality
     -create functions to easy integrate Zobrist, determine if capture or promotion and give following details for improved performace
 
-Create private variables
-    -to get items once to no recall
-
-isGameOver
-    -return who won
-
-Notation 
-    -add promorion sqaures for get x and get y functionality
+PGN load and get  
+    -function to convert notation to chess and chess to notation

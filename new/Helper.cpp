@@ -12,6 +12,8 @@
 #include <string.h> 
 #include <string>
 #include <iterator>
+#include <unordered_map>
+#include <iterator>
 using namespace std;
 
 enum Piece { KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN, EMPTY };
@@ -21,6 +23,12 @@ static const char *notation_str[] = {
   "a1","a2","a3","a4","a5","a6","a7","a8","b1","b2","b3","b4","b5","b6","b7","b8","c1","c2","c3","c4","c5","c6","c7","c8","d1","d2","d3","d4","d5","d6","d7","d8","e1","e2","e3","e4","e5","e6","e7","e8","f1","f2","f3","f4","f5","f6","f7","f8","g1","g2","g3","g4","g5","g6","g7","g8","h1","h2","h3","h4","h5","h6","h7","h8","a8Q","a8R","a8N","a8B","b8Q","b8R","b8N","b8B","c8Q","c8R","c8N","c8B","d8Q","d8R","d8N","d8B","e8Q","e8R","e8N","e8B","f8Q","f8R","f8N","f8B","g8Q","g8R","g8N","g8B","h8Q","h8R","h8N","h8B","a1q","a1r","a1n","a1b","b1q","b1r","b1n","b1b","c1q","c1r","c1n","c1b","d1q","d1r","d1n","d1b","e1q","e1r","e1n","e1b","f1q","f1r","f1n","f1b","g1q","g1r","g1n","g1b","h1q","h1r","h1n","h1b","MOVE"
 };
 
+void print_map(std::unordered_map<string, int> const &m)
+{
+    for (auto const &pair: m) {
+        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
+    }
+}
 
 string notationToString(int enum_val) {
     string tmp(notation_str[enum_val]);

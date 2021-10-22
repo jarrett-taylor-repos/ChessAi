@@ -8,11 +8,15 @@ class Board {
         int turnNum;
         Notation enpassantTarget;
         Color moveColor;
+        bool wasCaptureOrPromo;
         int halfTurnNum;
         int fullTurnNum;
         bool wKQ_bkq[4]; //0 means cant castle
         bool white_a1Kh1[3]; //0 means moved piece
         bool black_a8kh8[3]; //0 means moved piece
+        
+
+        unordered_map<string, int> fenMap;
 
         vector<pair<Square*, Square*>> vectorGetAllLegalMoves; 
         vector<pair<Notation, Notation>> vectorGetNotationMoves;        
@@ -22,12 +26,17 @@ class Board {
 
         Color getMoveColor();
         vector<pair<Notation, Notation>> getAllMovesVector();
+        unordered_map<string, int> getfenMap();
+        void setfenMap(); 
+        int getFenRepeat();
+        bool getWasCaptureOrPromo();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
 
         void setMoveColor();
 
+        Color Winner();
         bool isGameOver();
         bool isCheckmate();
         bool isDraw();
@@ -90,6 +99,7 @@ Board::Board() {
             board[y][x].setxy(y, x);
         }
     }
+    wasCaptureOrPromo = false;
     turnNum = 0;
     enpassantTarget = MOVE;
     moveColor = WHITE;
@@ -132,6 +142,7 @@ Board::Board() {
     }
     vectorGetAllLegalMoves = getAllMoves();
     vectorGetNotationMoves = getAllMovesVector();
+    setfenMap();
 }
 
 Color Board::getMoveColor() {
@@ -156,6 +167,32 @@ vector<pair<Notation, Notation>> Board::getAllMovesVector() {
     }
     return moves;
 }
+
+unordered_map<string, int> Board::getfenMap() {
+    return fenMap;
+}
+
+void Board::setfenMap() {
+    allFENs[turnNum] = getFEN();
+    string fen_info = split(allFENs[turnNum], " ")[0];
+    unordered_map<string, int>::iterator it = fenMap.find(fen_info);
+    if(it != fenMap.end()) {
+        it->second++;
+    } else { 
+        fenMap.insert(make_pair(fen_info, 1));
+    }
+}
+int Board::getFenRepeat() {
+    string findfen = split(getFEN(), " ")[0];
+    unordered_map<string, int>::iterator it = getfenMap().find(findfen);
+    int repeat = it->second;
+    return repeat;
+}
+
+bool Board::getWasCaptureOrPromo() {
+    return wasCaptureOrPromo;
+}
+
 
 void Board::setMoveColor() {
     if(moveColor == WHITE) {
@@ -206,6 +243,7 @@ void Board::loadFEN(string fen) {
 
     halfTurnNum = stoi(fen_50);
     fullTurnNum = stoi(fen_move);
+    wasCaptureOrPromo = false;
 
     int position = 0;
     for(int i = 0; i < fen_str.length(); i++) {
@@ -240,6 +278,18 @@ void Board::loadFEN(string fen) {
     vectorGetNotationMoves = getAllMovesVector();
 }
 
+Color Board::Winner() {
+    if(isCheckmate()) {
+        if(moveColor == BLACK) {
+            return WHITE;
+        } else {
+            return BLACK;
+        }
+    } else {
+        return NONE;
+    }
+}
+
 bool Board::isGameOver() {
     bool game = isCheckmate() || isDraw();
     return game;
@@ -270,25 +320,17 @@ bool Board::isDraw() {
     return draw;
 }
 bool Board::repitionDraw() {
-    bool repdraw = false;
-    vector<string> fenstring;
-    for(int i = 0; i < turnNum; i++) {
-        vector<string> fen_info = split(allFENs[i], " ");
-        if(fen_info[0] != ""){
-            fenstring.push_back(fen_info[0]);
-        } else {
-            break;
-        }
-    }
+    allFENs[turnNum] = getFEN();
 
-    for(int i = 0; i < turnNum; i++) {
-        int repeat = count(fenstring.begin(), fenstring.end(), fenstring[i]);
-        if(repeat == 3) {
-            repdraw = true;
-            break;
+    string fen_info = split(allFENs[turnNum], " ")[0];
+    unordered_map<string, int>::iterator it = fenMap.find(fen_info);
+    if(it != fenMap.end()) {
+        if(it->second==3) {
+            return true;
         }
     }
-    return repdraw;
+    return false;
+
 }
 bool Board::noForcedMateDraw() {
     bool noforce = false;
@@ -336,15 +378,7 @@ bool Board::makeMove(Notation start, Notation end) {
     //if can make move return true and make move
     bool move_made = false;
     Square* sqstart = getSquare(start);
-    Square* sqend;
-    string notToString =  notationToString(end);
-    if(notToString.length() == 3) {
-        notToString.pop_back();
-        Notation promo = stringToNotation(notToString);
-        sqend = getSquare(promo);
-    } else {
-        sqend = getSquare(end);
-    }
+    Square* sqend = getSquare(end);
     
     bool rightColor = sqstart->getColor() == moveColor;
     vectorGetAllLegalMoves = getAllMoves();
@@ -485,13 +519,19 @@ bool Board::makeMove(Notation start, Notation end) {
             moveColor = WHITE;
         }
         turnNum++;
+        move_made = true;
+        if(promotion || capture) {
+            wasCaptureOrPromo = true;
+        } else {
+            wasCaptureOrPromo = false;
+        }
+        setfenMap();
     } else {
         move_made = false;
     }
     
     vectorGetAllLegalMoves = getAllMoves();
     vectorGetNotationMoves = getAllMovesVector();
-    move_made = true;
     return move_made;
 }
 
@@ -1734,6 +1774,70 @@ Square* Board::getSquare(Notation strsq) {
         case h6: x=7; y=2;break;
         case h7: x=7; y=1;break;
         case h8: x=7; y=0;break;
+        case a8Q: x=0; y=0;break;
+        case a8R: x=0; y=0;break;
+        case a8B: x=0; y=0;break;
+        case a8N: x=0; y=0;break;
+        case b8Q: x=1; y=0;break;
+        case b8R: x=1; y=0;break;
+        case b8B: x=1; y=0;break;
+        case b8N: x=1; y=0;break;
+        case c8Q: x=2; y=0;break;
+        case c8R: x=2; y=0;break;
+        case c8B: x=2; y=0;break;
+        case c8N: x=2; y=0;break;
+        case d8Q: x=3; y=0;break;
+        case d8R: x=3; y=0;break;
+        case d8B: x=3; y=0;break;
+        case d8N: x=3; y=0;break;
+        case e8Q: x=4; y=0;break;
+        case e8R: x=4; y=0;break;
+        case e8B: x=4; y=0;break;
+        case e8N: x=4; y=0;break;
+        case f8Q: x=5; y=0;break;
+        case f8R: x=5; y=0;break;
+        case f8B: x=5; y=0;break;
+        case f8N: x=5; y=0;break;
+        case g8Q: x=6; y=0;break;
+        case g8R: x=6; y=0;break;
+        case g8B: x=6; y=0;break;
+        case g8N: x=6; y=0;break;
+        case h8Q: x=7; y=0;break;
+        case h8R: x=7; y=0;break;
+        case h8B: x=7; y=0;break;
+        case h8N: x=7; y=0;break;
+        case a1q: x=0; y=7;break;
+        case a1r: x=0; y=7;break;
+        case a1b: x=0; y=7;break;
+        case a1n: x=0; y=7;break;
+        case b1q: x=1; y=7;break;
+        case b1r: x=1; y=7;break;
+        case b1b: x=1; y=7;break;
+        case b1n: x=1; y=7;break;
+        case c1q: x=2; y=7;break;
+        case c1r: x=2; y=7;break;
+        case c1b: x=2; y=7;break;
+        case c1n: x=2; y=7;break;
+        case d1q: x=3; y=7;break;
+        case d1r: x=3; y=7;break;
+        case d1b: x=3; y=7;break;
+        case d1n: x=3; y=7;break;
+        case e1q: x=4; y=7;break;
+        case e1r: x=4; y=7;break;
+        case e1b: x=4; y=7;break;
+        case e1n: x=4; y=7;break;
+        case f1q: x=5; y=7;break;
+        case f1r: x=5; y=7;break;
+        case f1b: x=5; y=7;break;
+        case f1n: x=5; y=7;break;
+        case g1q: x=6; y=7;break;
+        case g1r: x=6; y=7;break;
+        case g1b: x=6; y=7;break;
+        case g1n: x=6; y=7;break;
+        case h1q: x=7; y=7;break;
+        case h1r: x=7; y=7;break;
+        case h1b: x=7; y=7;break;
+        case h1n: x=7; y=7;break;
     }
     Square* sq = getSquare(x, y);
     return sq;

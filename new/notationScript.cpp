@@ -73,4 +73,24 @@ int main() {
           cout <<  "if(s=="<< "\"" << temp << "\") " << "return " <<temp << ";" << endl;
       }
   }
+
+    vector<string> letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    vector<string> promo = {"Q", "R", "B", "N"};
+    for(int i = 0; i < letters.size(); i++) {
+        for(int j =0; j < promo.size(); j++) {
+        cout << "case ";
+        cout << letters[i] << "8"<<promo[j]<<": ";
+        cout << "x=" << i << "; y=0;";
+        cout << "break;"<<endl;
+        }
+    }
+    promo = {"q", "r", "b", "n"};
+    for(int i = 0; i < letters.size(); i++) {
+        for(int j =0; j < promo.size(); j++) {
+        cout << "case ";
+        cout << letters[i] << "1"<<promo[j]<<": ";
+        cout << "x=" << i << "; y=7;";
+        cout << "break;"<<endl;
+        }
+    }
 }
