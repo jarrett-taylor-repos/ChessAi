@@ -4,14 +4,15 @@
 
 int main() {
     Board b;
-    // b.makeMoveAndPrint(e2, e4);
-    // b.makeMoveAndPrint(e7, e5);
-    // b.makeMoveAndPrint(d1, f3);
-    // b.makeMoveAndPrint(a7, a6);
-    // b.makeMoveAndPrint(f1, c4);
-    // b.makeMoveAndPrint(b8, c6);
-    // b.makeMoveAndPrint(f3, f7);
-    // b.makeMoveAndPrint(a8, b8);//should be checkmate
+    b.makeMoveAndPrint(e2, e4);
+    b.makeMoveAndPrint(e7, e5);
+    b.makeMoveAndPrint(d1, f3);
+    b.makeMoveAndPrint(a7, a6);
+    b.makeMoveAndPrint(f1, c4);
+    b.makeMoveAndPrint(b8, c6);
+    b.makeMoveAndPrint(f3, f7);
+    b.makeMoveAndPrint(a8, b8);//should be checkmate
+    print_map(b.getfenMap());
 
     // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
     // b.loadFEN(pinnedmoves);
@@ -53,10 +54,10 @@ int main() {
     // b.loadFEN(enpassantPin);
     // b.makeMoveAndPrint(b5, c6);//shouldnt make move
 
-    string enpassantPin ="8/8/2pp4/7r/R4Ppk/KP2P3/8/8 b - f3 0 1";//black enpassant pin
-    b.loadFEN(enpassantPin);
-    b.makeMoveAndPrint(g4, f3);//shouldnt make move
-    b.print();
+    // string enpassantPin ="8/8/2pp4/7r/R4Ppk/KP2P3/8/8 b - f3 0 1";//black enpassant pin
+    // b.loadFEN(enpassantPin);
+    // b.makeMoveAndPrint(g4, f3);//shouldnt make move
+    // b.print();
     
     
     return 0;

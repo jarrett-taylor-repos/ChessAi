@@ -173,8 +173,7 @@ unordered_map<string, int> Board::getfenMap() {
 }
 
 void Board::setfenMap() {
-    allFENs[turnNum] = getFEN();
-    string fen_info = split(allFENs[turnNum], " ")[0];
+    string fen_info = split(getFEN(), " ")[0];
     unordered_map<string, int>::iterator it = fenMap.find(fen_info);
     if(it != fenMap.end()) {
         it->second++;
@@ -184,8 +183,11 @@ void Board::setfenMap() {
 }
 int Board::getFenRepeat() {
     string findfen = split(getFEN(), " ")[0];
-    unordered_map<string, int>::iterator it = getfenMap().find(findfen);
-    int repeat = it->second;
+    unordered_map<string, int>::iterator it = fenMap.find(findfen);
+    int repeat = 0;
+    if(it != fenMap.end()) {
+        repeat = it->second;
+    }
     return repeat;
 }
 
@@ -320,9 +322,8 @@ bool Board::isDraw() {
     return draw;
 }
 bool Board::repitionDraw() {
-    allFENs[turnNum] = getFEN();
 
-    string fen_info = split(allFENs[turnNum], " ")[0];
+    string fen_info = split(getFEN(), " ")[0];
     unordered_map<string, int>::iterator it = fenMap.find(fen_info);
     if(it != fenMap.end()) {
         if(it->second==3) {
@@ -978,7 +979,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
         }
 
-        if(pawn->gety() == 3) {
+        if(pawn->gety() == 3 && enpassantTarget != MOVE) {
             Square* enpassantSquare = getSquare(enpassantTarget);
             int enpassantSquare_x = enpassantSquare->getx();
             int enpassantSquare_y = enpassantSquare->gety();
@@ -1039,7 +1040,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
         }
 
-        if(pawn->gety() == 4) {
+        if(pawn->gety() == 4  && enpassantTarget != MOVE) {
             Square* enpassantSquare = getSquare(enpassantTarget);
             int enpassantSquare_x = enpassantSquare->getx();
             int enpassantSquare_y = enpassantSquare->gety();
