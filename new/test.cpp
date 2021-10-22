@@ -61,14 +61,14 @@ pair<Notation, Notation> rootsearch(Board b){
     for(int i = 0; i < allmoves.size(); i++) {
         Notation n1 = allmoves[i].first;
         Notation n2 = allmoves[i].second;
-        cout<<"testing:"<<n1<<n2<<"ogFEN:"<<b.getFEN()<<endl;
+        //cout<<"testing:"<<n1<<n2<<endl;
         string FEN = b.getFEN();
         Board b2;
         b2.loadFEN(FEN);
         b2.makeMove(n1,n2);
         
         //make move
-        int score = -alphaBeta(b2,-beta,-alpha,0);
+        int score = -alphaBeta(b2,-beta,-alpha,2);
         if (score>alpha) {
             alpha = score;
             bestmove = make_pair(n1,n2); //
@@ -79,14 +79,20 @@ pair<Notation, Notation> rootsearch(Board b){
 
 int playgame(){
     Board b;
-    cout << b.getFEN();
-    while (!b.isGameOver()){
+    cout << b.getFEN()<<endl;
+    bool gn = !b.isGameOver();
+    while (gn){
+        //cout<<b.getMoveColor()<<endl;
         pair<Notation, Notation> move = rootsearch(b);
-        cout<<"FOUND MOVE";
-        cout<<move.first<<move.second<<endl;
-        b.makeMoveAndPrint(move.first,move.second);
+        //cout<<"FOUND MOVE";
+        //cout<<move.first<<move.second<<endl;
+        b.makeMove(move.first,move.second);
+        cout << b.getFEN()<<endl;
+        //cout<<b.getMoveColor()<<endl;
+        //cout<<endl<<endl;
         //b.print();
-        cout << b.getFEN()<<endl<<endl<<endl;
+        
+        gn = !b.isGameOver();
     }
     return 0;
 }
