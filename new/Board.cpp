@@ -166,6 +166,7 @@ vector<pair<Notation, Notation>> Board::getAllMovesVector() {
                 temp += whitepromos[i];
                 not_sq2 = stringToNotation(temp);
                 pair<Notation, Notation> pairNot = make_pair(not_sq1, not_sq2);
+                moves.push_back(pairNot);
             }
         } else if (promotionBlack) {
             Notation not_sq1 = getNotation(sq1x, sq1y);
@@ -176,18 +177,15 @@ vector<pair<Notation, Notation>> Board::getAllMovesVector() {
                 temp += blackpromos[i];
                 not_sq2 = stringToNotation(temp);
                 pair<Notation, Notation> pairNot = make_pair(not_sq1, not_sq2);
+                moves.push_back(pairNot);
             }
 
         } else {
             Notation not_sq1 = getNotation(sq1x, sq1y);
             Notation not_sq2 = getNotation(sq2x, sq2y);
             pair<Notation, Notation> pairNot = make_pair(not_sq1, not_sq2);
+            moves.push_back(pairNot);
         }
-
-        Notation not_sq1 = getNotation(sq1x, sq1y);
-        Notation not_sq2 = getNotation(sq2x, sq2y);
-        pair<Notation, Notation> pairNot = make_pair(not_sq1, not_sq2);
-        moves.push_back(pairNot);
     }
     return moves;
 }
