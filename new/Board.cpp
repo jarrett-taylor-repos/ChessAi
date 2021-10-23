@@ -12,8 +12,6 @@ class Board {
         int halfTurnNum;
         int fullTurnNum;
         bool wKQ_bkq[4]; //0 means cant castle
-        bool white_a1Kh1[3]; //0 means moved piece
-        bool black_a8kh8[3]; //0 means moved piece
         
 
         unordered_map<string, int> fenMap;
@@ -110,13 +108,6 @@ Board::Board() {
     wKQ_bkq[1] = true;
     wKQ_bkq[2] = true;
     wKQ_bkq[3] = true;
-
-    white_a1Kh1[0] = true; //0 means moved
-    white_a1Kh1[1] = true; //0 means moved
-    white_a1Kh1[2] = true; //0 means moved
-    black_a8kh8[0] = true; //0 means moved
-    black_a8kh8[1] = true; //0 means moved
-    black_a8kh8[2] = true; //0 means moved
 
     board[0][0].setPieceandColor(ROOK, BLACK);
     board[1][0].setPieceandColor(KNIGHT, BLACK);
@@ -503,12 +494,12 @@ bool Board::makeMove(Notation start, Notation end) {
         }
 
 
-        if(sqstart == getSquare(a1) || sqend == getSquare(a1)) { white_a1Kh1[0] = false; }
-        if(sqstart == getSquare(e1) || sqend == getSquare(e1)) { white_a1Kh1[1] = false; }
-        if(sqstart == getSquare(h1) || sqend == getSquare(h1)) { white_a1Kh1[2] = false; }
-        if(sqstart == getSquare(a8) || sqend == getSquare(a8)) { black_a8kh8[0] = false; }
-        if(sqstart == getSquare(e8) || sqend == getSquare(e8)) { black_a8kh8[1] = false; }
-        if(sqstart == getSquare(h8) || sqend == getSquare(h8)) { black_a8kh8[2] = false; }
+        if(sqstart == getSquare(a1) || sqend == getSquare(a1)) { wKQ_bkq[0] = false; }
+        if(sqstart == getSquare(e1) || sqend == getSquare(e1)) { wKQ_bkq[0] = false; wKQ_bkq[1] = false; }
+        if(sqstart == getSquare(h1) || sqend == getSquare(h1)) { wKQ_bkq[1] = false; }
+        if(sqstart == getSquare(a8) || sqend == getSquare(a8)) { wKQ_bkq[2] = false; }
+        if(sqstart == getSquare(e8) || sqend == getSquare(e8)) { wKQ_bkq[2] = false; wKQ_bkq[3] = false; }
+        if(sqstart == getSquare(h8) || sqend == getSquare(h8)) { wKQ_bkq[3] = false; }
 
         moves[turnNum] = make_pair(start, end);
 
@@ -1208,9 +1199,6 @@ vector<bool> Board::canWhiteCastle() {
     vector<bool> longshort;
     longshort.push_back(false);
     longshort.push_back(false);
-    bool a1 = white_a1Kh1[0];
-    bool king = white_a1Kh1[1];
-    bool h1 = white_a1Kh1[2];
 
     bool emptysquare_short = 
         getSquare(f1)->getPiece() == EMPTY &&
@@ -1230,11 +1218,11 @@ vector<bool> Board::canWhiteCastle() {
         isSquareAttack(getSquare(d1)).size() == 0 &&  
         isSquareAttack(getSquare(c1)).size() == 0;
 
-    if(a1 && king && wKQ_bkq[0] && no_checks_short && emptysquare_short) {
+    if(wKQ_bkq[0] && no_checks_short && emptysquare_short) {
         longshort[1] = true;
     }
 
-    if(h1 && king && wKQ_bkq[1] && no_checks_long && emptysquare_long) {
+    if(wKQ_bkq[1] && no_checks_long && emptysquare_long) {
         longshort[0] = true;
     }
 
@@ -1245,9 +1233,6 @@ vector<bool> Board::canBlackCastle() {
     vector<bool> longshort;
     longshort.push_back(false);
     longshort.push_back(false);
-    bool a8 = black_a8kh8[0];
-    bool king = black_a8kh8[1];
-    bool h8 = black_a8kh8[2];
 
     bool emptysquare_short = 
         getSquare(f8)->getPiece() == EMPTY &&
@@ -1267,11 +1252,11 @@ vector<bool> Board::canBlackCastle() {
         isSquareAttack(getSquare(d8)).size() == 0 &&  
         isSquareAttack(getSquare(c8)).size() == 0;
 
-    if(a8 && king && wKQ_bkq[2] && no_checks_short && emptysquare_short) {
+    if(wKQ_bkq[2] && no_checks_short && emptysquare_short) {
         longshort[1] = true;
     }
 
-    if(h8 && king && wKQ_bkq[3] && no_checks_long && emptysquare_long) {
+    if(wKQ_bkq[3] && no_checks_long && emptysquare_long) {
         longshort[0] = true;
     }
 
