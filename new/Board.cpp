@@ -7,7 +7,8 @@ class Board {
         int turnNum;
         Notation enpassantTarget;
         Color moveColor;
-        bool wasCaptureOrPromo;
+        bool wasCapture;
+        bool wasPromo;
         bool wasCastle;
         int halfTurnNum;
         int fullTurnNum;
@@ -27,7 +28,8 @@ class Board {
         unordered_map<string, int> getfenMap();
         void setfenMap(); 
         int getFenRepeat();
-        bool getWasCaptureOrPromo();
+        bool getWasCapture();
+        bool getWasPromo();
         bool getWasCastle();
 
         vector<bool> canWhiteCastle();
@@ -97,7 +99,8 @@ Board::Board() {
             board[y][x].setxy(y, x);
         }
     }
-    wasCaptureOrPromo = false;
+    wasCapture = false;
+    wasPromo = false;
     wasCastle = false;
     turnNum = 0;
     enpassantTarget = MOVE;
@@ -183,9 +186,13 @@ int Board::getFenRepeat() {
     return repeat;
 }
 
-bool Board::getWasCaptureOrPromo() {
-    return wasCaptureOrPromo;
+bool Board::getWasCapture() {
+    return wasCapture;
 }
+
+bool Board::getWasPromo(){
+    return wasPromo;
+};
 
 bool Board::getWasCastle(){
     return wasCastle;
@@ -240,7 +247,8 @@ void Board::loadFEN(string fen) {
 
     halfTurnNum = stoi(fen_50);
     fullTurnNum = stoi(fen_move);
-    wasCaptureOrPromo = false;
+    wasCapture = false;
+    wasPromo = false;
     wasCastle = false;
 
     int position = 0;
@@ -507,7 +515,8 @@ bool Board::makeMove(Notation start, Notation end) {
         setMoveColor();
         turnNum++;
         halfTurnNum = pawnmove || capture ? 0 : halfTurnNum++;
-        wasCaptureOrPromo = promotion || capture;
+        wasCapture = capture;
+        wasPromo = promotion;
         wasCastle = castleMove;
 
         move_made = true;
