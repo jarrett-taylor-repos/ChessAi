@@ -29,7 +29,6 @@ Square::Square()  {
   color = NONE;
 }
 
-
 //set 
 void Square::setPieceandColor(Piece p, Color col) {
   piece = p;

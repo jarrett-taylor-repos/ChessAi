@@ -502,22 +502,21 @@ bool Board::makeMove(Notation start, Notation end) {
         }
 
 
-        if(sqstart == getSquare(a1) || sqend == getSquare(a1)) { wKQ_bkq[0] = false; }
-        if(sqstart == getSquare(e1) || sqend == getSquare(e1)) { wKQ_bkq[0] = false; wKQ_bkq[1] = false; }
-        if(sqstart == getSquare(h1) || sqend == getSquare(h1)) { wKQ_bkq[1] = false; }
-        if(sqstart == getSquare(a8) || sqend == getSquare(a8)) { wKQ_bkq[2] = false; }
-        if(sqstart == getSquare(e8) || sqend == getSquare(e8)) { wKQ_bkq[2] = false; wKQ_bkq[3] = false; }
-        if(sqstart == getSquare(h8) || sqend == getSquare(h8)) { wKQ_bkq[3] = false; }
+        if(start == a1 || end == a1) { wKQ_bkq[0] = false; }
+        if(start == e1 || end == e1) { wKQ_bkq[0] = false; wKQ_bkq[1] = false; }
+        if(start == h1 || end == h1) { wKQ_bkq[1] = false; }
+        if(start == a8 || end == a8) { wKQ_bkq[2] = false; }
+        if(start == e8 || end == e8) { wKQ_bkq[2] = false; wKQ_bkq[3] = false; }
+        if(start == h8 || end == h8) { wKQ_bkq[3] = false; }
 
         moves[turnNum] = make_pair(start, end);
-
-
-        setMoveColor();
-        turnNum++;
-        halfTurnNum = pawnmove || capture ? 0 : halfTurnNum++;
         wasCapture = capture;
         wasPromo = promotion;
         wasCastle = castleMove;
+        if(pawnmove || capture) { halfTurnNum = 0; } else { halfTurnNum++; }
+        if(moveColor == BLACK) { fullTurnNum++; }
+        setMoveColor();
+        turnNum++;
 
         move_made = true;
         setfenMap();
