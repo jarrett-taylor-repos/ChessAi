@@ -12,7 +12,7 @@ int main() {
     b.makeMoveAndPrint(b8, c6);
     b.makeMoveAndPrint(f3, f7);
     b.makeMoveAndPrint(a8, b8);//should be checkmate
-    print_map(b.getfenMap());
+    //print_map(b.getfenMap());
 
     // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
     // b.loadFEN(pinnedmoves);

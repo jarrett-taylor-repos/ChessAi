@@ -4,7 +4,6 @@ class Board {
     private:
         Square board[8][8];
         pair<Notation,Notation> moves[1000];
-        string allFENs[1000];
         int turnNum;
         Notation enpassantTarget;
         Color moveColor;
@@ -92,7 +91,6 @@ Board::Board() {
     moveColor = WHITE;
     for(int i = 0; i < 1000; i++) {
         moves[i] = make_pair(MOVE, MOVE);
-        allFENs[i] = "";
     }
 
     for(int y = 0; y < 8; y++) {
@@ -512,33 +510,16 @@ bool Board::makeMove(Notation start, Notation end) {
         if(sqstart == getSquare(e8) || sqend == getSquare(e8)) { black_a8kh8[1] = false; }
         if(sqstart == getSquare(h8) || sqend == getSquare(h8)) { black_a8kh8[2] = false; }
 
-        allFENs[turnNum] = getFEN();
         moves[turnNum] = make_pair(start, end);
-        if(pawnmove || capture) {
-            halfTurnNum = 0;
-        } else {
-            halfTurnNum++;
-        }
 
-        if(moveColor == WHITE) {
-            moveColor = BLACK;
-        } else {
-            fullTurnNum++;
-            moveColor = WHITE;
-        }
+
+        setMoveColor();
         turnNum++;
-        move_made = true;
-        if(promotion || capture) {
-            wasCaptureOrPromo = true;
-        } else {
-            wasCaptureOrPromo = false;
-        }
+        halfTurnNum = pawnmove || capture ? 0 : halfTurnNum++;
+        wasCaptureOrPromo = promotion || capture;
+        wasCastle = castleMove;
 
-        if(castleMove) {
-            wasCastle = true;
-        } else {
-            wasCastle = false;
-        }
+        move_made = true;
         setfenMap();
     } else {
         move_made = false;
