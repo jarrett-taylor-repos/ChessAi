@@ -502,12 +502,12 @@ bool Board::makeMove(Notation start, Notation end) {
         }
 
 
-        if(start == a1 || end == a1) { wKQ_bkq[0] = false; }
+        if(start == a1 || end == a1) { wKQ_bkq[1] = false; }
         if(start == e1 || end == e1) { wKQ_bkq[0] = false; wKQ_bkq[1] = false; }
-        if(start == h1 || end == h1) { wKQ_bkq[1] = false; }
-        if(start == a8 || end == a8) { wKQ_bkq[2] = false; }
+        if(start == h1 || end == h1) { wKQ_bkq[0] = false; }
+        if(start == a8 || end == a8) { wKQ_bkq[3] = false; }
         if(start == e8 || end == e8) { wKQ_bkq[2] = false; wKQ_bkq[3] = false; }
-        if(start == h8 || end == h8) { wKQ_bkq[3] = false; }
+        if(start == h8 || end == h8) { wKQ_bkq[2] = false; }
 
         moves[turnNum] = make_pair(start, end);
         wasCapture = capture;
