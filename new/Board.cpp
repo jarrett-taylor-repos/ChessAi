@@ -981,7 +981,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
             Square* king = getKing(BLACK);
             Square* attacked;
-            if(x > enpassantSquare_x) {
+            if(abs(x-king->getx()) > abs(enpassantSquare_x-king->getx())) {
                 attacked = pawn;
             } else {
                 attacked = enpassantSquare;
@@ -1042,7 +1042,7 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
             Square* king = getKing(BLACK);
             Square* attacked;
-            if(x > enpassantSquare_x) {
+            if(abs(x-king->getx()) > abs(enpassantSquare_x-king->getx())) {
                 attacked = pawn;
             } else {
                 attacked = enpassantSquare;
