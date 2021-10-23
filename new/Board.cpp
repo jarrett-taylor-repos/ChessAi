@@ -9,6 +9,7 @@ class Board {
         Notation enpassantTarget;
         Color moveColor;
         bool wasCaptureOrPromo;
+        bool wasCastle;
         int halfTurnNum;
         int fullTurnNum;
         bool wKQ_bkq[4]; //0 means cant castle
@@ -30,6 +31,7 @@ class Board {
         void setfenMap(); 
         int getFenRepeat();
         bool getWasCaptureOrPromo();
+        bool getWasCastle();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
@@ -100,6 +102,7 @@ Board::Board() {
         }
     }
     wasCaptureOrPromo = false;
+    wasCastle = false;
     turnNum = 0;
     enpassantTarget = MOVE;
     moveColor = WHITE;
@@ -195,6 +198,9 @@ bool Board::getWasCaptureOrPromo() {
     return wasCaptureOrPromo;
 }
 
+bool Board::getWasCastle(){
+    return wasCastle;
+};
 
 void Board::setMoveColor() {
     if(moveColor == WHITE) {
@@ -246,6 +252,7 @@ void Board::loadFEN(string fen) {
     halfTurnNum = stoi(fen_50);
     fullTurnNum = stoi(fen_move);
     wasCaptureOrPromo = false;
+    wasCastle = false;
 
     int position = 0;
     for(int i = 0; i < fen_str.length(); i++) {
@@ -525,6 +532,12 @@ bool Board::makeMove(Notation start, Notation end) {
             wasCaptureOrPromo = true;
         } else {
             wasCaptureOrPromo = false;
+        }
+
+        if(castleMove) {
+            wasCastle = true;
+        } else {
+            wasCastle = false;
         }
         setfenMap();
     } else {
