@@ -73,7 +73,7 @@ class Board {
 
         Square* getSquare(Piece p, Color c);
         Square* getSquare(Notation c);
-        Square* getSquare(int x, int y);//add in promo square
+        Square* getSquare(int x, int y);
         Notation getNotation(int, int);
 
         string moveToChess(Notation start, Notation end);//used for pgn 
@@ -1087,7 +1087,7 @@ Square* Board::getKing(Color c) {
     for(int i = 0; i < 8; i++) {
         for(int j = 0; j < 8; j++) {
             temp = getSquare(i, j);
-            if(temp->getColor() == c && temp->getPiece() == KING) {
+            if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
                 king = temp;
             }
         }
