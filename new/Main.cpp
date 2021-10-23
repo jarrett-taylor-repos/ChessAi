@@ -24,11 +24,11 @@ int main() {
     // b.print();
     // b.makeMoveAndPrint(e5, d6);
     
-    string castle = "rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4";
-    b.loadFEN(castle);
-    b.print();
-    b.makeMoveAndPrint(e1, g1);
-    b.makeMoveAndPrint(e8, g8);
+    // string castle = "rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4";
+    // b.loadFEN(castle);
+    // b.print();
+    // b.makeMoveAndPrint(e1, g1);
+    // b.makeMoveAndPrint(e8, g8);
 
     // string promo = "rnbq1rk1/ppP1ppbp/5np1/8/8/5NP1/P1pPPPBP/RNBQ1RK1 w - - 0 9";
     // b.loadFEN(promo);
@@ -56,8 +56,16 @@ int main() {
 
     // string enpassantPin ="8/8/2pp4/7r/R4Ppk/KP2P3/8/8 b - f3 0 1";//black enpassant pin
     // b.loadFEN(enpassantPin);
-    // b.makeMoveAndPrint(g4, f3);//shouldnt make move
+    // cout << b.makeMove(g4, f3) << endl;//shouldnt make move
     // b.print();
+
+    string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
+    b.loadFEN(promotest);
+    b.print();
+    vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    for(int i = 0; i < notmoves.size(); i++) {
+        cout << notmoves[i].first << notmoves[i].second << endl;
+    }
     
     
     return 0;
