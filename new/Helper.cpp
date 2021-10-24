@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <iterator>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 enum Piece { KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN, EMPTY };
