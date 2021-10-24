@@ -1130,17 +1130,14 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
 
 Square* Board::getKing(Color c) {
-    Square* king;
-    Square* temp;
     for(int i = 0; i < 8; i++) {
         for(int j = 0; j < 8; j++) {
-            temp = getSquare(i, j);
+            Square* temp = getSquare(i, j);
             if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
-                king = temp;
+                return temp;
             }
         }
     }
-    return king;
 }
 
 
@@ -1833,7 +1830,7 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
 }
 
 void Board::loadPGN(string pgn) {
-    
+
 }
 
 Square* Board::getSquare(Piece p, Color c) {
