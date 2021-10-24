@@ -65,6 +65,7 @@ std::ostream& operator<<(std::ostream& out, const Notation value){
         INSERT_ELEMENT(f1q);INSERT_ELEMENT(f1r);INSERT_ELEMENT(f1b);INSERT_ELEMENT(f1n);
         INSERT_ELEMENT(g1q);INSERT_ELEMENT(g1r);INSERT_ELEMENT(g1b);INSERT_ELEMENT(g1n);
         INSERT_ELEMENT(h1q);INSERT_ELEMENT(h1r);INSERT_ELEMENT(h1b);INSERT_ELEMENT(h1n);
+        INSERT_ELEMENT(MOVE);
 #undef INSERT_ELEMENT
     }   
 

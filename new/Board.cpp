@@ -87,6 +87,7 @@ class Board {
         string getPGN();
         string getFEN();
         void updatePGN(string move);
+        void loadPGN(string pgn);
 
 };
 
@@ -285,6 +286,7 @@ void Board::loadFEN(string fen) {
     wasCapture = false;
     wasPromo = false;
     wasCastle = false;
+    allPGN = "";
 
     int position = 0;
     for(int i = 0; i < fen_str.length(); i++) {
@@ -1830,6 +1832,9 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
     return chess;
 }
 
+void Board::loadPGN(string pgn) {
+    
+}
 
 Square* Board::getSquare(Piece p, Color c) {
     Square* temp;
