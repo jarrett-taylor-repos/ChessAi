@@ -4,15 +4,15 @@
 
 int main() {
     Board b;
-    b.makeMoveAndPrint(e2, e4);
-    b.makeMoveAndPrint(e7, e5);
-    b.makeMoveAndPrint(d1, f3);
-    b.makeMoveAndPrint(a7, a6);
-    b.makeMoveAndPrint(f1, c4);
-    b.makeMoveAndPrint(b8, c6);
-    b.makeMoveAndPrint(f3, f7);
-    b.makeMoveAndPrint(a8, b8);//should be checkmate
-    cout << b.getPGN() << endl;
+    // b.makeMoveAndPrint(e2, e4);
+    // b.makeMoveAndPrint(e7, e5);
+    // b.makeMoveAndPrint(d1, f3);
+    // b.makeMoveAndPrint(a7, a6);
+    // b.makeMoveAndPrint(f1, c4);
+    // b.makeMoveAndPrint(b8, c6);
+    // b.makeMoveAndPrint(f3, f7);
+    // b.makeMoveAndPrint(a8, b8);//should be checkmate
+    // cout << b.getPGN() << endl;
     //print_map(b.getfenMap());
 
     // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
@@ -67,6 +67,14 @@ int main() {
     // for(int i = 0; i < notmoves.size(); i++) {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
+
+    string testfen = "rnbq1rk1/pp2ppbp/2p2np1/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7";
+    b.loadFEN(testfen);
+    b.makeMoveAndPrint(c4, d5);
+    b.makeMoveAndPrint(c6, d5);
+
+
+
     
     
     return 0;

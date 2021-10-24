@@ -1787,10 +1787,10 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
     string capx = "";
     if(capture) {
         if(startp == PAWN) {
-            capx = notationToString(start)[0] + "x";
-        } else {
-            capx = "x";
+            string temp = notationToString(start);
+            capx += temp[0];
         }
+        capx += "x";
     }
     string endsquare = notationToString(end);
     string promoPiece = promotion ? "="+pieceToChess(endp) : "";
@@ -1822,10 +1822,12 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
 
     string ambiguity = "";
     if(rowcol[0]) {//same row state file
-        ambiguity = notationToString(start)[0];
+        string temp = notationToString(start);
+        ambiguity = temp[0];
     }
     if(rowcol[1]) {//same column state rank
-        ambiguity = notationToString(start)[1];
+        string temp = notationToString(start);
+        ambiguity = temp[1];
     }
 
     chess = piece + ambiguity + capx + endsquare + check;
