@@ -1,5 +1,4 @@
 #include <random>
-#include "Board.cpp"
 #include "zstuff.cpp"
 #include "Zobristclass.cpp"
 using namespace std;
@@ -88,11 +87,12 @@ zstuff board2zvals(Board b,array<array<array<long long int,12>,8>,9> zarray){
 
     //TODO: Cating rights and shit
 
-    return zstuff(zval,materialadv);
+    return zstuff(zval,materialadv,b);
 }
 
 
-zstuff zmove(Board b, Notation first,Notation second,zstuff zobriststuff,array<array<array<long long int,12>,8>,9> zarray){
+zstuff zmove(Notation first,Notation second,zstuff zobriststuff,array<array<array<long long int,12>,8>,9> zarray){
+    Board b = zobriststuff.b;
     int materialadv = zobriststuff.materialadv;
     long long int zval = zobriststuff.zval;
     array<int,12> materialevals = {1,3,3,5,9,36,-1,-3,-3,-5,-9,-36};
@@ -131,7 +131,7 @@ zstuff zmove(Board b, Notation first,Notation second,zstuff zobriststuff,array<a
 
     zval = zval^zarray[9][0][0];
 
-    return zstuff(zval,materialadv);
+    return zstuff(zval,materialadv,b);
 
 }
 
