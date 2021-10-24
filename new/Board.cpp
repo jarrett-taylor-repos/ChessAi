@@ -18,7 +18,8 @@ class Board {
         unordered_map<string, int> fenMap;
 
         vector<pair<Square*, Square*>> vectorGetAllLegalMoves; 
-        vector<pair<Notation, Notation>> vectorGetNotationMoves;        
+        vector<pair<Notation, Notation>> vectorGetNotationMoves;
+        string allPGN;   
     public:
         Board();
         void loadFEN(string fen);
@@ -77,13 +78,15 @@ class Board {
         Square* getSquare(int x, int y);
         Notation getNotation(int, int);
 
-        string moveToChess(Notation start, Notation end);//used for pgn 
+        string pieceToChess(Piece p);
+        string moveToChess(Notation start, Notation end, bool capture, bool promotion, bool castle, Piece startp, Piece endp, vector<bool>);//used for pgn 
 
 
         void print();
         string boardString();
         string getPGN();
         string getFEN();
+        void updatePGN(string move);
 
 };
 
@@ -111,6 +114,7 @@ Board::Board() {
     wKQ_bkq[1] = true;
     wKQ_bkq[2] = true;
     wKQ_bkq[3] = true;
+    allPGN = "";
 
     board[0][0].setPieceandColor(ROOK, BLACK);
     board[1][0].setPieceandColor(KNIGHT, BLACK);
@@ -415,6 +419,8 @@ bool Board::makeMove(Notation start, Notation end) {
     bool move_made = false;
     Square* sqstart = getSquare(start);
     Square* sqend = getSquare(end);
+    Piece startp = sqstart->getPiece();
+    Piece endp = sqstart->getPiece();
     
     bool rightColor = sqstart->getColor() == moveColor;
     vectorGetAllLegalMoves = getAllMoves();
@@ -425,6 +431,7 @@ bool Board::makeMove(Notation start, Notation end) {
         move_made = false;
     }
     bool legalmove = false;
+    vector<bool> ambiguity_rowcol = {false, false};
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
         Square* teststart = vectorGetAllLegalMoves[i].first;
         Square* testend = vectorGetAllLegalMoves[i].second;
@@ -434,7 +441,18 @@ bool Board::makeMove(Notation start, Notation end) {
         bool testyend = testend->gety() == sqend->gety();
         if(testxstart && testystart && testxend && testyend) {
             legalmove = true;
-            break;
+        }
+        bool test2PiecesRow = teststart->getPiece() == sqstart->getPiece() //same piece
+            && testxend && testyend //test same end sqaure
+            && testystart && !testxstart; //test if in same row but diffent column
+        bool test2PiecesColumn = teststart->getPiece() == sqstart->getPiece() //same piece
+            && testxend && testyend //test same end sqaure
+            && testxstart && !testystart; //test if in same column but diffent row
+        if(test2PiecesRow) {
+            ambiguity_rowcol[0] = true;
+        }
+        if(test2PiecesColumn) {
+            ambiguity_rowcol[1] = true;
         }
     }
 
@@ -507,6 +525,7 @@ bool Board::makeMove(Notation start, Notation end) {
                 capture = true;
             }
             Piece promoPiece = getPawnPromotion(end);
+            endp = promoPiece;
             sqend->setPieceandColor(promoPiece, sqstart->getColor());
             sqstart->setEmpty();
         } else {
@@ -548,15 +567,18 @@ bool Board::makeMove(Notation start, Notation end) {
         if(moveColor == BLACK) { fullTurnNum++; }
         setMoveColor();
         turnNum++;
-
-        move_made = true;
         setfenMap();
+        move_made = true;
     } else {
         move_made = false;
     }
     
     vectorGetAllLegalMoves = getAllMoves();
     vectorGetNotationMoves = getAllMovesVector();
+    if(move_made) {
+        string currmovetochess = moveToChess(start, end, wasCapture, wasPromo, wasCastle, startp, endp, ambiguity_rowcol);
+        updatePGN(currmovetochess);
+    }
     return move_made;
 }
 
@@ -1717,6 +1739,97 @@ string Board::getFEN() {
 
     return fen;
 }
+
+void Board::updatePGN(string move) {
+    if(moveColor == BLACK) {
+        allPGN += to_string(fullTurnNum) + ". " + move + " ";
+    } else {
+        allPGN += move + " ";
+    }
+}
+
+string Board::getPGN() {
+    return allPGN;
+}
+
+string Board::pieceToChess(Piece p) {
+    string piece;
+    switch(p) {
+        case KING:
+            piece = "K";
+            break;
+        case QUEEN:
+            piece = "Q";
+            break;
+        case ROOK:
+            piece = "R";
+            break;
+        case BISHOP:
+            piece = "B";
+            break;
+        case KNIGHT:
+            piece = "N";
+            break;
+        default:
+            piece = "";
+            break;
+    }
+    return piece;
+}
+
+string Board::moveToChess(Notation start, Notation end, bool capture, bool promotion, bool castle, Piece startp, Piece endp, vector<bool> rowcol) {
+    //[piece][ambiguity][capX][endsqaure][check]
+    
+    string chess = "";
+    string piece = pieceToChess(startp);
+    string capx = "";
+    if(capture) {
+        if(startp == PAWN) {
+            capx = notationToString(start)[0] + "x";
+        } else {
+            capx = "x";
+        }
+    }
+    string endsquare = notationToString(end);
+    string promoPiece = promotion ? "="+pieceToChess(endp) : "";
+    string check = "";
+    if(isCheckmate()) {
+        check = "#";
+    } else {
+        check = isInCheck().size() != 0 ? "+" : "";
+    }
+    
+    if(castle) {
+        Square* sq1 = getSquare(start);
+        Square* sq2 = getSquare(end);
+        int sq1x = sq1->getx();
+        int sq2x = sq2->getx();
+        if(sq1x > sq2x) {
+            return "O-O-O" + check;
+        } else {
+            return "O-O" + check;
+        }
+    }
+    if(promotion) {
+        if(capture) {
+            return capx + endsquare + promoPiece + check;
+        } else {
+            return endsquare + promoPiece + check;
+        }
+    }
+
+    string ambiguity = "";
+    if(rowcol[0]) {//same row state file
+        ambiguity = notationToString(start)[0];
+    }
+    if(rowcol[1]) {//same column state rank
+        ambiguity = notationToString(start)[1];
+    }
+
+    chess = piece + ambiguity + capx + endsquare + check;
+    return chess;
+}
+
 
 Square* Board::getSquare(Piece p, Color c) {
     Square* temp;

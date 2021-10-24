@@ -4,14 +4,15 @@
 
 int main() {
     Board b;
-    // b.makeMoveAndPrint(e2, e4);
-    // b.makeMoveAndPrint(e7, e5);
-    // b.makeMoveAndPrint(d1, f3);
-    // b.makeMoveAndPrint(a7, a6);
-    // b.makeMoveAndPrint(f1, c4);
-    // b.makeMoveAndPrint(b8, c6);
-    // b.makeMoveAndPrint(f3, f7);
-    // b.makeMoveAndPrint(a8, b8);//should be checkmate
+    b.makeMoveAndPrint(e2, e4);
+    b.makeMoveAndPrint(e7, e5);
+    b.makeMoveAndPrint(d1, f3);
+    b.makeMoveAndPrint(a7, a6);
+    b.makeMoveAndPrint(f1, c4);
+    b.makeMoveAndPrint(b8, c6);
+    b.makeMoveAndPrint(f3, f7);
+    b.makeMoveAndPrint(a8, b8);//should be checkmate
+    cout << b.getPGN() << endl;
     //print_map(b.getfenMap());
 
     // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
@@ -59,13 +60,13 @@ int main() {
     // cout << b.makeMove(g4, f3) << endl;//shouldnt make move
     // b.print();
 
-    string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
-    b.loadFEN(promotest);
-    b.print();
-    vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
-    for(int i = 0; i < notmoves.size(); i++) {
-        cout << notmoves[i].first << notmoves[i].second << endl;
-    }
+    // string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
+    // b.loadFEN(promotest);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
     
     
     return 0;
