@@ -771,19 +771,28 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
         pair<int, int> temp = movetHelper(x+pairs[i].first, y+pairs[i].second, sq);
         if(temp.first != -1) {
             Square* end = getSquare(temp.first, temp.second);
+            int endx = end->getx();
+            int endy = end->gety();
         
             if(pairatt.size() == 1) {
                 Square* att = getSquare(pairatt[0].first, pairatt[0].second);
                 int attx = att->getx();
                 int atty = att->gety();
                 bool notFutureCheck = isSquareAttack(end).size() == 0;
-                bool rooktoleft = (attx < sq->getx()) && (atty = sq->gety()) && end->gety() == atty && end->getx() > sq->getx();
-                bool rooktoright = (attx > sq->getx()) && (atty = sq->gety()) && end->gety() == atty && end->getx() < sq->getx();
-                bool rooktoup = (attx = sq->getx()) && (atty > sq->gety()) && end->getx() == att->getx() && end->gety() < sq->gety();
-                bool rooktodown = (attx = sq->getx()) && (atty < sq->gety()) && end->getx() == att->getx() && end->gety() > sq->gety();
+                bool rooktoleft = (attx < x) && (atty = y) && endy == atty && endx > x;
+                bool rooktoright = (attx > x) && (atty = y) && endy == atty && endx < x;
+                bool rooktoup = (attx = x) && (atty > y) && endx == att->getx() && endy < y;
+                bool rooktodown = (attx = x) && (atty < y) && endx == att->getx() && endy > y;
+
+                //add BISHOP logic
+                bool bishopupleft = (attx < x) && (atty < y) && endx > x && endy > y;
+                bool bishopupright = (attx > x) && (atty < y) && endx < x && endy > y;
+                bool bishopdownleft = (attx < x) && (atty > y) && endx > x && endy < y;
+                bool bishopdownright = (attx > x) && (atty > y) && endx < x && endy < y;
                 
+                bool noBishopAtt = !bishopupleft && !bishopupright && !bishopdownleft && !bishopdownright;
                 bool noRookAtt = !rooktoleft && !rooktoright && !rooktoup && !rooktodown;
-                if(notFutureCheck && noRookAtt) {
+                if(notFutureCheck && noRookAtt && noBishopAtt) {
                     pair<Square*, Square*> add = make_pair(sq, end);
                     kings.push_back(add);
                 }
