@@ -795,12 +795,14 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
                 int pairattx = pairatt[0].first;
                 int pairatty = pairatt[0].second;
                 Square* att = getSquare(pairattx, pairatty);
+                bool goodx = att->getx() == pairattx;
+                bool goody = att->gety() == pairatty;
                 vector<pair<int, int>> testend = isSquareAttack(end);
                 bool notFutureCheck = testend.size() == 0;
-                bool rooktoleft = (pairattx < x) && (pairatty = y) && endy == pairatty && endx > x;
-                bool rooktoright = (pairattx > x) && (pairatty = y) && endy == pairatty && endx < x;
-                bool rooktoup = (pairattx = x) && (pairatty > y) && endx == pairattx && endy < y;
-                bool rooktodown = (pairattx = x) && (pairatty < y) && endx == pairattx && endy > y;
+                bool rooktoleft = (pairattx < x) && (pairatty == y) && endy == pairatty && endx > x;
+                bool rooktoright = (pairattx > x) && (pairatty == y) && endy == pairatty && endx < x;
+                bool rooktoup = (pairattx == x) && (pairatty > y) && endx == pairattx && endy < y;
+                bool rooktodown = (pairattx == x) && (pairatty < y) && endx == pairattx && endy > y;
 
                 //add BISHOP logic
                 bool bishopupleft = (pairattx < x) && (pairatty < y) && endx > x && endy > y;
