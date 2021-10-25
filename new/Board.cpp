@@ -1211,6 +1211,9 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
 
     bool in_range_bishop = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny) && abs(kingx-pinx)==abs(kingy-piny);
     bool in_range_rook = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny);
+    if(!in_range_bishop && !in_range_rook) {
+        return make_pair(false, attacker);
+    }
 
     //test if attacker on pin is actually pinned by 
     bool is_bishop_pinning = in_range_bishop &&
