@@ -13,6 +13,7 @@ class Board {
         bool wasEnpassant;
         int halfTurnNum;
         int fullTurnNum;
+        string lastPGNmove;
         bool wKQ_bkq[4]; //0 means cant castle
         
 
@@ -36,6 +37,7 @@ class Board {
         bool getWasPromo();
         bool getWasCastle();
         bool getWasEnpassant();
+        string getLastPGNmove();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
@@ -83,7 +85,7 @@ class Board {
         Notation getNotation(int, int);
 
         string pieceToChess(Piece p);
-        string moveToChess(Notation start, Notation end, bool capture, bool promotion, bool castle, Piece startp, Piece endp, vector<bool>);//used for pgn 
+        string moveToChess(Notation, Notation, bool, bool, bool, Piece, Piece, vector<bool>);//used for pgn 
 
 
         void print();
@@ -116,6 +118,7 @@ Board::Board() {
     moveColor = WHITE;
     halfTurnNum = 0;
     fullTurnNum = 1;
+    lastPGNmove = "";
     wKQ_bkq[0] = true;
     wKQ_bkq[1] = true;
     wKQ_bkq[2] = true;
@@ -155,6 +158,9 @@ int Board::getFullTurnNum() {
     return fullTurnNum;
 };
 
+string Board::getLastPGNmove() {
+    return lastPGNmove;
+}
 
 Color Board::getMoveColor() {
     return moveColor;
@@ -303,6 +309,7 @@ void Board::loadFEN(string fen) {
     wasCastle = false;
     wasEnpassant = false;
     allPGN = "";
+    lastPGNmove = "";
 
     int position = 0;
     for(int i = 0; i < fen_str.length(); i++) {
@@ -1789,6 +1796,7 @@ string Board::getFEN() {
 }
 
 void Board::updatePGN(string move) {
+    lastPGNmove = move;
     if(moveColor == BLACK) {
         allPGN += to_string(fullTurnNum) + ". " + move + " ";
     } else {
