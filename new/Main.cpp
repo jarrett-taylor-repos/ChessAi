@@ -18,6 +18,10 @@ int main() {
     // string pinnedmoves = "4k3/4r3/4Q3/8/8/3R1R2/8/4K3 b - - 0 1";
     // b.loadFEN(pinnedmoves);
     // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
     // b.makeMoveAndPrint(e7, e6);
 
     // string enpassm = "rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
