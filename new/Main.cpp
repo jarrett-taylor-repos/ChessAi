@@ -68,12 +68,18 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string testfen = "rnbq1rk1/pp2ppbp/2p2np1/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7";
-    b.loadFEN(testfen);
-    b.makeMoveAndPrint(c4, d5);
-    b.makeMoveAndPrint(c6, d5);
+    // string testfen = "rnbq1rk1/pp2ppbp/2p2np1/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7";
+    // b.loadFEN(testfen);
+    // b.makeMoveAndPrint(c4, d5);
+    // b.makeMoveAndPrint(c6, d5);
 
-
+    // string testcheckmoves = "rnbqkbnr/1ppp1ppp/p7/P3R2P/8/1PN5/2PPPPP1/2BQKBNR b Kk - 0 11";
+    // b.loadFEN(testcheckmoves);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
 
     
     

@@ -632,14 +632,12 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
         vector<pair<Square*, Square*>> testmoves;
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(i, j);
+                Square* temp = getSquare(j, i);
                 if(temp->getPiece() != EMPTY && temp->getPiece() != KING) {
                     pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
-                    if(pinnedmoves.first) {
-                        vector<pair<Square*, Square*>> moves = pinnedmoves.second;
-                        for(int k = 0; k < moves.size(); k++) {
-                            testmoves.push_back(moves[k]);
-                        }
+                    vector<pair<Square*, Square*>> moves = pinnedmoves.second;
+                    for(int k = 0; k < moves.size(); k++) {
+                        testmoves.push_back(moves[k]);
                     }
                 }
             }
