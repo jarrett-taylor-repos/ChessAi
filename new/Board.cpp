@@ -10,6 +10,7 @@ class Board {
         bool wasCapture;
         bool wasPromo;
         bool wasCastle;
+        bool wasEnpassant;
         int halfTurnNum;
         int fullTurnNum;
         bool wKQ_bkq[4]; //0 means cant castle
@@ -32,6 +33,7 @@ class Board {
         bool getWasCapture();
         bool getWasPromo();
         bool getWasCastle();
+        bool getWasEnpassant();
 
         vector<bool> canWhiteCastle();
         vector<bool> canBlackCastle(); 
@@ -106,6 +108,7 @@ Board::Board() {
     wasCapture = false;
     wasPromo = false;
     wasCastle = false;
+    wasEnpassant = false;
     turnNum = 0;
     enpassantTarget = MOVE;
     moveColor = WHITE;
@@ -234,6 +237,10 @@ bool Board::getWasCastle(){
     return wasCastle;
 };
 
+bool Board::getWasEnpassant() {
+    return wasEnpassant;
+}
+
 void Board::setMoveColor() {
     if(moveColor == WHITE) {
         moveColor = BLACK;
@@ -286,6 +293,7 @@ void Board::loadFEN(string fen) {
     wasCapture = false;
     wasPromo = false;
     wasCastle = false;
+    wasEnpassant = false;
     allPGN = "";
 
     int position = 0;
@@ -565,6 +573,7 @@ bool Board::makeMove(Notation start, Notation end) {
         wasCapture = capture;
         wasPromo = promotion;
         wasCastle = castleMove;
+        wasEnpassant = enpassant;
         if(pawnmove || capture) { halfTurnNum = 0; } else { halfTurnNum++; }
         if(moveColor == BLACK) { fullTurnNum++; }
         setMoveColor();
