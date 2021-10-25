@@ -85,7 +85,12 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    
-    
+    string testcheckmoves2 = "8/rp1b1kbp/5np1/4Q3/4P2P/2rK1P2/1qP3P1/3R3R w - - 0 20";
+    b.loadFEN(testcheckmoves2);
+    b.print();
+    vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    for(int i = 0; i < notmoves.size(); i++) {
+        cout << notmoves[i].first << notmoves[i].second << endl;
+    }
     return 0;
 }

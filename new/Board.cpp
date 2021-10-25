@@ -766,15 +766,33 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
         }
     }
 
-
+    vector<pair<int, int>> pairatt = isSquareAttack(sq);
     for(int i = 0; i < pairs.size(); i++) {
         pair<int, int> temp = movetHelper(x+pairs[i].first, y+pairs[i].second, sq);
         if(temp.first != -1) {
             Square* end = getSquare(temp.first, temp.second);
-            bool notFutureCheck = isSquareAttack(end).size() == 0;
-            if(notFutureCheck) {
-                pair<Square*, Square*> add = make_pair(sq, end);
-                kings.push_back(add);
+        
+            if(pairatt.size() == 1) {
+                Square* att = getSquare(pairatt[0].first, pairatt[0].second);
+                int attx = att->getx();
+                int atty = att->gety();
+                bool notFutureCheck = isSquareAttack(end).size() == 0;
+                bool rooktoleft = (attx < sq->getx()) && (atty = sq->gety()) && end->gety() == atty && end->getx() > sq->getx();
+                bool rooktoright = (attx > sq->getx()) && (atty = sq->gety()) && end->gety() == atty && end->getx() < sq->getx();
+                bool rooktoup = (attx = sq->getx()) && (atty > sq->gety()) && end->getx() == att->getx() && end->gety() < sq->gety();
+                bool rooktodown = (attx = sq->getx()) && (atty < sq->gety()) && end->getx() == att->getx() && end->gety() > sq->gety();
+                
+                bool noRookAtt = !rooktoleft && !rooktoright && !rooktoup && !rooktodown;
+                if(notFutureCheck && noRookAtt) {
+                    pair<Square*, Square*> add = make_pair(sq, end);
+                    kings.push_back(add);
+                }
+            } else {
+                bool notFutureCheck = isSquareAttack(end).size() == 0;
+                if(notFutureCheck) {
+                    pair<Square*, Square*> add = make_pair(sq, end);
+                    kings.push_back(add);
+                }
             }
         }
     }
@@ -1156,6 +1174,9 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
     int king_to_attaker_y = abs(kingy-atty);
 
     bool in_range = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny);
+    if(!in_range) {
+        return make_pair(false, attacker);
+    }
 
     //test if attacker on pin is actually pinned by 
     bool is_bishop_pinning = in_range &&
