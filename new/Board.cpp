@@ -1182,21 +1182,19 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
     int king_to_attaker_x = abs(kingx-attx);
     int king_to_attaker_y = abs(kingy-atty);
 
-    bool in_range = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny);
-    if(!in_range) {
-        return make_pair(false, attacker);
-    }
+    bool in_range_bishop = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny) && abs(kingx-pinx)==abs(kingy-piny);
+    bool in_range_rook = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny);
 
     //test if attacker on pin is actually pinned by 
-    bool is_bishop_pinning = in_range &&
+    bool is_bishop_pinning = in_range_bishop &&
         (king_to_attaker_x == king_to_attaker_y) && 
         (king_to_attaker_x > 1 && king_to_attaker_x > 1) &&
         (attacker->getPiece() == QUEEN || attacker->getPiece() == BISHOP); 
 
-    bool is_rook_pinning = in_range &&
+    bool is_rook_pinning = in_range_rook &&
         (king_to_attaker_x == 0 && king_to_attaker_y != 0) || 
         (king_to_attaker_x != 0 && king_to_attaker_y == 0) && 
-        (attacker->getPiece() == ROOK || attacker->getPiece() == BISHOP);
+        (attacker->getPiece() == ROOK || attacker->getPiece() == QUEEN);
 
     if(is_bishop_pinning || is_rook_pinning) {
         return make_pair(true, attacker);
@@ -1849,11 +1847,11 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
     }
 
     string ambiguity = "";
-    if(rowcol[0]) {//same row state file
+    if(rowcol[0] && startp != PAWN) {//same row state file
         string temp = notationToString(start);
         ambiguity = temp[0];
     }
-    if(rowcol[1]) {//same column state rank
+    if(rowcol[1] && startp != PAWN) {//same column state rank
         string temp = notationToString(start);
         ambiguity = temp[1];
     }

@@ -155,8 +155,8 @@ bool isInRange(int x, int y) {
 }
 
 bool inRange(int a, int b, int x) {        
-  return (a <= x && x <= b) ||
-    (b <= x && x <= a);         
+  return (a < x && x < b) ||
+    (b < x && x < a);         
 }  
 
 
