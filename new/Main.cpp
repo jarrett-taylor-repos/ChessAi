@@ -93,12 +93,21 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string testcheck3 = "2b1k1nr/2r2qpp/n2p4/6B1/Qp2P3/4RN2/5PPP/1N2K2R b Kk - 1 21";
-    b.loadFEN(testcheck3);
+    // string testcheck3 = "2b1k1nr/2r2qpp/n2p4/6B1/Qp2P3/4RN2/5PPP/1N2K2R b Kk - 1 21";
+    // b.loadFEN(testcheck3);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+    
+    string testcheck4 = "rnb1k1nr/pppp1ppp/8/4N3/Nb1qp3/8/PPPP1KPP/R1BQ3R w kq - 2 9";//bishop type
+    b.loadFEN(testcheck4);
     b.print();
     vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
     for(int i = 0; i < notmoves.size(); i++) {
         cout << notmoves[i].first << notmoves[i].second << endl;
     }
+    
     return 0;
 }

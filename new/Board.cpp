@@ -25,6 +25,8 @@ class Board {
         Board();
         void loadFEN(string fen);
 
+        int getFullTurnNum();
+
         Color getMoveColor();
         vector<pair<Notation, Notation>> getAllMovesVector();
         unordered_map<string, int> getfenMap();
@@ -147,6 +149,12 @@ Board::Board() {
     vectorGetNotationMoves = getAllMovesVector();
     setfenMap();
 }
+
+
+int Board::getFullTurnNum() {
+    return fullTurnNum;
+};
+
 
 Color Board::getMoveColor() {
     return moveColor;
@@ -784,20 +792,21 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
             int endy = end->gety();
         
             if(pairatt.size() == 1) {
-                Square* att = getSquare(pairatt[0].first, pairatt[0].second);
-                int attx = att->getx();
-                int atty = att->gety();
-                bool notFutureCheck = isSquareAttack(end).size() == 0;
-                bool rooktoleft = (attx < x) && (atty = y) && endy == atty && endx > x;
-                bool rooktoright = (attx > x) && (atty = y) && endy == atty && endx < x;
-                bool rooktoup = (attx = x) && (atty > y) && endx == att->getx() && endy < y;
-                bool rooktodown = (attx = x) && (atty < y) && endx == att->getx() && endy > y;
+                int pairattx = pairatt[0].first;
+                int pairatty = pairatt[0].second;
+                Square* att = getSquare(pairattx, pairatty);
+                vector<pair<int, int>> testend = isSquareAttack(end);
+                bool notFutureCheck = testend.size() == 0;
+                bool rooktoleft = (pairattx < x) && (pairatty = y) && endy == pairatty && endx > x;
+                bool rooktoright = (pairattx > x) && (pairatty = y) && endy == pairatty && endx < x;
+                bool rooktoup = (pairattx = x) && (pairatty > y) && endx == pairattx && endy < y;
+                bool rooktodown = (pairattx = x) && (pairatty < y) && endx == pairattx && endy > y;
 
                 //add BISHOP logic
-                bool bishopupleft = (attx < x) && (atty < y) && endx > x && endy > y;
-                bool bishopupright = (attx > x) && (atty < y) && endx < x && endy > y;
-                bool bishopdownleft = (attx < x) && (atty > y) && endx > x && endy < y;
-                bool bishopdownright = (attx > x) && (atty > y) && endx < x && endy < y;
+                bool bishopupleft = (pairattx < x) && (pairatty < y) && endx > x && endy > y;
+                bool bishopupright = (pairattx > x) && (pairatty < y) && endx < x && endy > y;
+                bool bishopdownleft = (pairattx < x) && (pairatty > y) && endx > x && endy < y;
+                bool bishopdownright = (pairattx > x) && (pairatty > y) && endx < x && endy < y;
                 
                 bool noBishopAtt = !bishopupleft && !bishopupright && !bishopdownleft && !bishopdownright;
                 bool noRookAtt = !rooktoleft && !rooktoright && !rooktoup && !rooktodown;
