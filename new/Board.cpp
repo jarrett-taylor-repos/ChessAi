@@ -1217,7 +1217,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
 
     //get all squares between pin and king and see if same color piece between so not a pin 
     bool piecebetweenpinandking = false;
-    if(in_range_bishop) {
+    if(in_range_bishop && pin->getColor() == moveColor) {
         int pintokingx = pinx-kingx; //3-6=-3
         int pintokingy = piny-kingy; //3-0=3
         for(int i = 1; i < abs(pintokingx); i++) {
@@ -1231,7 +1231,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
             }
         }
     }
-    if(in_range_rook) {
+    if(in_range_rook && pin->getColor() == moveColor) {
         int pintokingx = pinx-kingx; //3-6=-3
         int pintokingy = piny-kingy; //3-0=3
         bool negx = pintokingx < 0;
