@@ -133,10 +133,38 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string impossiblemoves = "rnb2b1r/1p1nkpp1/3pq3/p7/P1PP3p/8/1PBBQPPP/R3K1NR b KQ - 4 14";
-    b.loadFEN(impossiblemoves);
+    // string impossiblemoves = "rnb2b1r/1p1nkpp1/3pq3/p7/P1PP3p/8/1PBBQPPP/R3K1NR b KQ - 4 14";
+    // b.loadFEN(impossiblemoves);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    // string impMove2 = "rn2Qk1r/ppq1bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 2 9";
+    // b.loadFEN(impMove2);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    // string impMove3 = "rnQ2k1r/ppq1bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 9";
+    // b.loadFEN(impMove3);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    string impMove4 = "rnQq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 8";
+    b.loadFEN(impMove4);
     b.print();
     vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    cout << notmoves.size() << endl;
     for(int i = 0; i < notmoves.size(); i++) {
         cout << notmoves[i].first << notmoves[i].second << endl;
     }
