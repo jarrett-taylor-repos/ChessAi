@@ -109,8 +109,24 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string testcheck5 = "rnQ1kb1r/1p1npp1p/3p4/p2P2P1/1q6/3RB3/6PP/2K2BNR b k - 0 26";
-    b.loadFEN(testcheck5);
+    // string testcheck5 = "rnQ1kb1r/1p1npp1p/3p4/p2P2P1/1q6/3RB3/6PP/2K2BNR b k - 0 26";
+    // b.loadFEN(testcheck5);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    // string testmoves = "rn1q1rk1/2ppbppp/pp6/3b4/8/1Q3NP1/PP2PPBP/R1B2RK1 b - - 1 12";
+    // b.loadFEN(testmoves);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    string testpinmoves2 = "rnbqkbnr/pppppppp/4b3/8/8/4R3/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
+    b.loadFEN(testpinmoves2);
     b.print();
     vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
     for(int i = 0; i < notmoves.size(); i++) {

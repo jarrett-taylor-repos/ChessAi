@@ -694,7 +694,7 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
         //cout << "0 checks" << endl;
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(i, j);
+                Square* temp = getSquare(j, i);
                 if(temp->getPiece() != EMPTY && temp->getColor() != NONE) {
                     pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
                     if(pinnedmoves.first) {
@@ -1210,18 +1210,59 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
     int king_to_attaker_y = abs(kingy-atty);
 
     bool in_range_bishop = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny) && abs(kingx-pinx)==abs(kingy-piny);
-    bool in_range_rook = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny);
+    bool in_range_rook = inRange(kingx, attx, pinx) && inRange(kingy, atty, piny) && (king_to_attaker_x == 0 || king_to_attaker_y == 0);
     if(!in_range_bishop && !in_range_rook) {
         return make_pair(false, attacker);
     }
 
+    //get all squares between pin and king and see if same color piece between so not a pin 
+    bool piecebetweenpinandking = false;
+    if(in_range_bishop) {
+        int pintokingx = pinx-kingx; //3-6=-3
+        int pintokingy = piny-kingy; //3-0=3
+        for(int i = 1; i < abs(pintokingx); i++) {
+            bool negx = pintokingx < 0;
+            bool negy = pintokingy < 0;
+            int testx = (negx) ? kingx-i: kingx+i;
+            int testy = (negy) ? kingy-i: kingy+i;
+            Square* temp = getSquare(testx, testy);
+            if(temp->getPiece() != EMPTY) {
+                piecebetweenpinandking = true;
+            }
+        }
+    }
+    if(in_range_rook) {
+        int pintokingx = pinx-kingx; //3-6=-3
+        int pintokingy = piny-kingy; //3-0=3
+        bool negx = pintokingx < 0;
+        bool negy = pintokingy < 0;
+        if(pintokingx == 0) {//same x, check y
+            for(int i = 1; i < abs(pintokingy); i++) {
+                int testy=(negy) ? kingy-i: kingy+i;
+                Square* temp = getSquare(kingx, testy);
+                if(temp->getPiece() != EMPTY) {
+                    piecebetweenpinandking = true;
+                }
+            }
+
+        } else {//same y, check x
+            for(int i = 1; i < abs(pintokingx); i++) {
+                int testx=(negx) ? kingx-i: kingx+i;
+                Square* temp = getSquare(testx, kingy);
+                if(temp->getPiece() != EMPTY) {
+                piecebetweenpinandking = true;
+            }
+            }
+        }
+    }
+
     //test if attacker on pin is actually pinned by 
-    bool is_bishop_pinning = in_range_bishop &&
+    bool is_bishop_pinning = in_range_bishop && !piecebetweenpinandking &&
         (king_to_attaker_x == king_to_attaker_y) && 
         (king_to_attaker_x > 1 && king_to_attaker_x > 1) &&
         (attacker->getPiece() == QUEEN || attacker->getPiece() == BISHOP); 
 
-    bool is_rook_pinning = in_range_rook &&
+    bool is_rook_pinning = in_range_rook && !piecebetweenpinandking &&
         (king_to_attaker_x == 0 && king_to_attaker_y != 0) || 
         (king_to_attaker_x != 0 && king_to_attaker_y == 0) && 
         (attacker->getPiece() == ROOK || attacker->getPiece() == QUEEN);
