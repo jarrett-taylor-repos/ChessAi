@@ -13,7 +13,8 @@ int moveGenerationTest(Board b, int depth) {
     vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
     for(int i = 0; i < notmoves.size(); i++) {
         pair<Notation, Notation> tempmove = notmoves[i];
-        Board temp(fen);
+        Board temp;
+        temp.loadFEN(fen);
         //cout << "before move " << temp.getFEN() << " - " << tempmove.first << tempmove.second << endl;
         bool mademove = temp.makeMove(tempmove.first, tempmove.second);
         //cout << "after move " << temp.getFEN() << " - " << tempmove.first << tempmove.second << endl;
@@ -32,14 +33,14 @@ int moveGenerationTest(Board b, int depth) {
 
 int main() {
     string testPos = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-    //Board b(testPos);
     // 1 - 44
     // 2 - 1486
     // 3 - 62379
     // 4 - 2103487
     // 5 - 89,941,194
-
     Board b;
+    //b.loadFEN(testPos);
+
     // 1	20
     // 2	400
     // 3	8,902

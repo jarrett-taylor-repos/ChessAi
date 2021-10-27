@@ -21,10 +21,16 @@ class Board {
         vector<pair<Square*, Square*>> vectorGetAllLegalMoves; 
         vector<pair<Notation, Notation>> vectorGetNotationMoves;
         string allPGN;   
+        vector<Square*> allPieces;
     public:
         Board();
         Board(string fen);
+        Board(const Board &b);
         void loadFEN(string fen);
+
+        vector<Square*> getAllPieces();
+        void addPieceToVector(Square*);
+        bool removeSquareFromVector(Square*);
 
         int getFullTurnNum();
 
@@ -52,6 +58,7 @@ class Board {
         bool noForcedMateDraw();
         bool makeMove(Notation, Notation);
         void makeMoveAndPrint(Notation, Notation);
+        void removeMove();
 
 
         vector<pair<Square*, Square*>> getAllMoves();
@@ -99,6 +106,9 @@ class Board {
 
 Board::Board() {
     moveColor = WHITE;
+    // for(int i = 0; i < 1000; i++) {
+    //     moves[i] = make_pair(MOVE, MOVE);
+    // }
 
     for(int y = 0; y < 8; y++) {
         for(int x = 0; x < 8; x++) {
@@ -143,12 +153,18 @@ Board::Board() {
     for (int i = 0; i < 8; i++) {
         board[i][1].setPieceandColor(PAWN, BLACK);
         board[i][6].setPieceandColor(PAWN, WHITE);
-
+    }
+    for(int i = 0; i < 8; i++) { 
+        allPieces.push_back(getSquare(i, 1));
+        allPieces.push_back(getSquare(i, 6));
+        allPieces.push_back(getSquare(i, 0));
+        allPieces.push_back(getSquare(i, 7));
     }
     vectorGetAllLegalMoves = getAllMoves();
     vectorGetNotationMoves = getAllMovesVector();
     setfenMap();
 }
+
 
 Board::Board(string fen) {
     //format of fen
@@ -223,6 +239,7 @@ Board::Board(string fen) {
             Color c = getColorFromChar(ch);
             board[f][r].setPieceandColor(p, c);
             board[f][r].setxy(f, r);
+            allPieces.push_back(getSquare(f, r));
             position++;
         } else {
             //useless
@@ -231,6 +248,59 @@ Board::Board(string fen) {
     vectorGetAllLegalMoves = getAllMoves();
     vectorGetNotationMoves = getAllMovesVector();
 }
+
+Board::Board(const Board &b) {
+    for(int i = 0; i < 8; i++) {
+        for(int j = 0; j < 8; j++) {
+            board[i][j] = b.board[i][j];
+        }
+    }
+    //board[8][8] = b.board[8][8];
+    turnNum = b.turnNum;
+    enpassantTarget = b.enpassantTarget;
+    moveColor = b.moveColor;
+    wasCapture = b.wasCapture;
+    wasPromo = b.wasPromo;
+    wasCastle = b.wasCastle;
+    wasEnpassant = b.wasEnpassant;
+    halfTurnNum = b.halfTurnNum;
+    fullTurnNum = b.fullTurnNum;
+    lastPGNmove = b.lastPGNmove;
+    for(int i = 0; i < 4; i++) {
+        wKQ_bkq[i] = b.wKQ_bkq[i];
+    }
+    //wKQ_bkq[4] = b.wKQ_bkq[4];
+    fenMap = b.fenMap;
+    vectorGetAllLegalMoves = b.vectorGetAllLegalMoves;
+    vectorGetNotationMoves = b.vectorGetNotationMoves;
+    allPGN = b.allPGN;
+    allPieces = b.allPieces;
+
+}
+
+vector<Square*> Board::getAllPieces() {
+    return allPieces;
+}
+void Board::addPieceToVector(Square*s) {
+    allPieces.push_back(s);
+}
+bool Board::removeSquareFromVector(Square*s) {
+    for(int i = 0; i < allPieces.size(); i++) {
+        Square* curr = allPieces[i];
+        int currx = curr->getx();
+        int curry = curr->gety();
+
+        int sx = s->getx();
+        int sy = s->gety();
+        bool equal = currx == sx && curry == sy;
+        if(equal) {
+            allPieces.erase(allPieces.begin()+i);
+            return true;
+        }
+    }
+    return false;
+}
+
 
 int Board::getFullTurnNum() {
     return fullTurnNum;
@@ -412,7 +482,7 @@ void Board::loadFEN(string fen) {
             Piece p = getPieceFromChar(ch);
             Color c = getColorFromChar(ch);
             board[f][r].setPieceandColor(p, c);
-
+            allPieces.push_back(getSquare(r, f));
             position++;
         } else {
             //useless
@@ -477,26 +547,14 @@ bool Board::repitionDraw() {
 }
 bool Board::noForcedMateDraw() {
     bool noforce = false;
-    vector<pair<Piece, Color>> pieces;
-    for(int i = 0; i < 8; i++) {
-        for(int j = 0; j < 8; j++) {
-            Square* temp = getSquare(i, j);
-            if(temp->getPiece() != EMPTY) {
-                Piece p = temp->getPiece();
-                Color c = temp->getColor();
-                pair<Piece, Color> add = make_pair(p, c);
-                pieces.push_back(add);
-            }
-        }
-    }
 
-    if(pieces.size() == 2) {
+    if(allPieces.size() == 2) {
         noforce = true;
     }
-    if(pieces.size() == 3) {
-        Piece p1 = pieces[0].first;
-        Piece p2 = pieces[1].first;
-        Piece p3 = pieces[2].first;
+    if(allPieces.size() == 3) {
+        Piece p1 = allPieces[0]->getPiece();
+        Piece p2 = allPieces[1]->getPiece();
+        Piece p3 = allPieces[2]->getPiece();
         bool isKnight = (p1 == KNIGHT) || (p2 == KNIGHT) || (p3 == KNIGHT);
         bool isBishop = (p1 == BISHOP) || (p2 == BISHOP) || (p3 == BISHOP);
         if(isKnight || isBishop) {
@@ -516,8 +574,6 @@ void Board::makeMoveAndPrint(Notation start, Notation end) {
 }
 
 bool Board::makeMove(Notation start, Notation end) {
-    //cout << "makeMove()" << endl;
-    //cout << "moveColor: " << moveColor << endl;
     //if can make move return true and make move
     bool move_made = false;
     Square* sqstart = getSquare(start);
@@ -583,15 +639,23 @@ bool Board::makeMove(Notation start, Notation end) {
                     Square* a1sqaure = getSquare(a1);
                     sqend->setPieceandColor(KING, WHITE);
                     d1sqaure->setPieceandColor(ROOK, WHITE);
+                    allPieces.push_back(getSquare(end));
+                    allPieces.push_back(getSquare(d1));
                     sqstart->setEmpty();
                     a1sqaure->setEmpty();
+                    removeSquareFromVector(getSquare(start));
+                    removeSquareFromVector(getSquare(a1));
                 } else {
                     Square* f1sqaure = getSquare(f1);
                     Square* h1sqaure = getSquare(h1);
                     sqend->setPieceandColor(KING, WHITE);
                     f1sqaure->setPieceandColor(ROOK, WHITE);
+                    allPieces.push_back(getSquare(end));
+                    allPieces.push_back(getSquare(f1));
                     sqstart->setEmpty();
                     h1sqaure->setEmpty();
+                    removeSquareFromVector(getSquare(start));
+                    removeSquareFromVector(getSquare(h1));
                 }
             } else {
                 bool longcastle = end == c8;
@@ -602,23 +666,34 @@ bool Board::makeMove(Notation start, Notation end) {
                     Square* a8sqaure = getSquare(a8);
                     sqend->setPieceandColor(KING, BLACK);
                     d8sqaure->setPieceandColor(ROOK, BLACK);
+                    allPieces.push_back(getSquare(end));
+                    allPieces.push_back(getSquare(d8));
                     sqstart->setEmpty();
                     a8sqaure->setEmpty();
+                    removeSquareFromVector(getSquare(start));
+                    removeSquareFromVector(getSquare(a8));
                 } else {
                     Square* f8sqaure = getSquare(f8);
                     Square* h8sqaure = getSquare(h8);
                     sqend->setPieceandColor(KING, BLACK);
                     f8sqaure->setPieceandColor(ROOK, BLACK);
+                    allPieces.push_back(getSquare(end));
+                    allPieces.push_back(getSquare(f8));
                     sqstart->setEmpty();
                     h8sqaure->setEmpty();
+                    removeSquareFromVector(getSquare(start));
+                    removeSquareFromVector(getSquare(h8));
                 }
             }
         } else if(enpassant) {
             pawnmove=true;
             sqend->setPieceandColor(PAWN, sqstart->getColor());
+            allPieces.push_back(getSquare(end));
             sqstart->setEmpty();
+            removeSquareFromVector(getSquare(start));
             Square* takenpawn = getSquare(sqend->getx(), sqstart->gety());
             takenpawn->setEmpty();
+            removeSquareFromVector(takenpawn);
         } else if(promotion) {
             pawnmove=true;
             if(sqend->getPiece() != EMPTY) {
@@ -627,7 +702,9 @@ bool Board::makeMove(Notation start, Notation end) {
             Piece promoPiece = getPawnPromotion(end);
             endp = promoPiece;
             sqend->setPieceandColor(promoPiece, sqstart->getColor());
+            allPieces.push_back(getSquare(end));
             sqstart->setEmpty();
+            removeSquareFromVector(getSquare(start));
         } else {
             if(sqstart->getPiece() == PAWN) {
                 pawnmove = true;
@@ -636,7 +713,9 @@ bool Board::makeMove(Notation start, Notation end) {
                 capture = true;
             }
             sqend->setPieceandColor(sqstart->getPiece(), sqstart->getColor());
+            allPieces.push_back(getSquare(end));
             sqstart->setEmpty();
+            removeSquareFromVector(getSquare(start));
         }
 
         if(pawnDoubleMove) {
@@ -659,7 +738,7 @@ bool Board::makeMove(Notation start, Notation end) {
         if(start == e8 || end == e8) { wKQ_bkq[2] = false; wKQ_bkq[3] = false; }
         if(start == h8 || end == h8) { wKQ_bkq[2] = false; }
 
-
+        //moves[turnNum] = make_pair(start, end);
         wasCapture = capture;
         wasPromo = promotion;
         wasCastle = castleMove;
@@ -681,6 +760,10 @@ bool Board::makeMove(Notation start, Notation end) {
         vectorGetNotationMoves = getAllMovesVector();
     }
     return move_made;
+}
+
+void Board::removeMove() {
+
 }
 
 Piece Board::getPawnPromotion(Notation n){
@@ -729,15 +812,13 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
         return getPieceMoves(king);
     } else if(checks.size() == 1) { //if in single check, return all moves that block the check, can caputre the piece without check or move to king to non check position
         vector<pair<Square*, Square*>> testmoves;
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(j, i);
-                if(temp->getPiece() != EMPTY && temp->getPiece() != KING && temp->getColor() == moveColor) {
-                    pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
-                    vector<pair<Square*, Square*>> moves = pinnedmoves.second;
-                    for(int k = 0; k < moves.size(); k++) {
-                        testmoves.push_back(moves[k]);
-                    }
+        for(int i = 0; i < allPieces.size(); i++) {
+            Square* temp = allPieces[i];
+            if(temp->getPiece() != EMPTY && temp->getPiece() != KING && temp->getColor() == moveColor) {
+                pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
+                vector<pair<Square*, Square*>> goodmoves = pinnedmoves.second;
+                for(int k = 0; k < goodmoves.size(); k++) {
+                    testmoves.push_back(goodmoves[k]);
                 }
             }
         }
@@ -765,38 +846,26 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
 
 
     } else { //if no check, need to see if piece is pinned, if pinned get all moves possible will pin in mind
-        //coutTab(1);
-        //cout << "0 checks" << endl;
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(j, i);
-                if(temp->getPiece() != EMPTY && temp->getColor() != NONE) {
-                    pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
-                    vector<pair<Square*, Square*>> moves = pinnedmoves.second;
-                    for(int k = 0; k < moves.size(); k++) {
-                        allmoves.push_back(moves[k]);
-                    }
+        for(int i = 0; i < allPieces.size(); i++) {
+            Square* temp = allPieces[i];
+            if(temp->getPiece() != EMPTY && temp->getColor() != NONE && temp->getColor() == moveColor) {
+                pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
+                vector<pair<Square*, Square*>> goodmoves = pinnedmoves.second;
+                for(int k = 0; k < goodmoves.size(); k++) {
+                    allmoves.push_back(goodmoves[k]);
                 }
             }
         }
     }
-    //coutTab(1);
-    //cout << "get all moves done" << endl;
     return allmoves;
 }
 
 vector<pair<Square*, Square*>> Board::getPieceMoves(Square*sq){
-    //coutTab(3);
-    //cout << "getPieceMoves()" << endl;
     vector<pair<Square*, Square*>> temp = {make_pair(nullptr, nullptr)};
     Piece p = sq->getPiece();
-    //coutTab(3);
-    //cout << "Piece: " << p << endl;
     switch(p){
         case KING:
             temp = KingMoves(sq);
-            //coutTab(3);
-            //cout << "king moves size: " << temp.size() << endl;
             break;
         case QUEEN:
             temp = QueenMoves(sq);
@@ -814,8 +883,6 @@ vector<pair<Square*, Square*>> Board::getPieceMoves(Square*sq){
             temp = PawnMoves(sq);
             break;
     }
-    //coutTab(3);
-    //cout << "piecemoves size: " << temp.size() << endl;
     return temp;
 }
 vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
@@ -1249,13 +1316,11 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
 Square* Board::getKing(Color c) {
     Square* king;
-    for(int i = 0; i < 8; i++) {
-        for(int j = 0; j < 8; j++) {
-            Square* temp = getSquare(i, j);
-            if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
-                king = temp;
-                break;
-            }
+    for(int i = 0; i < allPieces.size(); i++) {
+        Square* temp = allPieces[i];
+        if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
+            king = temp;
+            break;
         }
     }
     return king;
@@ -1389,33 +1454,12 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
         legalmoves = getPieceMoves(s);
         return make_pair(false, legalmoves);
     }
-    //coutTab(2);
-    //cout << "returnthis: " << returnthis.first << ", " << returnthis.second.size() << endl;
     return returnthis;
 
 }
 
 vector<pair<int,int>> Board::isInCheck() {
-    vector<pair<int,int>> checks;
-    if(moveColor == WHITE) {
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(i, j);
-                if(temp->getColor() == WHITE && temp->getPiece() == KING) {
-                    checks = isSquareAttack(temp);
-                }
-            }
-        }
-    } else {
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Square* temp = getSquare(i, j);
-                if(temp->getColor() == BLACK && temp->getPiece() == KING) {
-                    checks = isSquareAttack(temp);
-                }
-            }
-        }
-    }
+    vector<pair<int,int>> checks = isSquareAttack(getKing(moveColor));
     return checks;
 }
 
