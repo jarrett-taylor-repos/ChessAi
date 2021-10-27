@@ -169,8 +169,16 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string vectorTest = "2rqkbnr/1bpppppp/1pn5/p7/2P1P1P1/N4P2/PP1P3P/R1BQKBNR w KQk - 3 6";
-    Board b(vectorTest);
+    // string vectorTest = "2rqkbnr/1bpppppp/1pn5/p7/2P1P1P1/N4P2/PP1P3P/R1BQKBNR w KQk - 3 6";
+    // Board b(vectorTest);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+    string testmate = "rnbqkbnr/ppppp2p/8/5ppQ/2P5/4P3/PP1P1PPP/RNB1KBNR b KQkq - 1 3";
+    Board b(testmate);
     b.print();
     vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
     cout << notmoves.size() << endl;

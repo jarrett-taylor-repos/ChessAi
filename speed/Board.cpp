@@ -759,10 +759,10 @@ bool Board::makeMove(Notation start, Notation end) {
     }
     
     if(move_made) {
-        string currmovetochess = moveToChess(start, end, wasCapture, wasPromo, wasCastle, startp, endp, ambiguity_rowcol);
-        updatePGN(currmovetochess);
         vectorGetAllLegalMoves = getAllMoves();
         vectorGetNotationMoves = getAllMovesVector();
+        string currmovetochess = moveToChess(start, end, wasCapture, wasPromo, wasCastle, startp, endp, ambiguity_rowcol);
+        updatePGN(currmovetochess);
     }
     return move_made;
 }
