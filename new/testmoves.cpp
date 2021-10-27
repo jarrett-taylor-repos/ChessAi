@@ -36,11 +36,22 @@ int main() {
     // 4 - 2103487
     // 5 - 89,941,194
     Board b;
-    b.loadFEN(testPos);
-    int depth = 5;
+    //b.loadFEN(testPos);
+
+    // 1	20
+    // 2	400
+    // 3	8,902
+    // 4	197,281
+    // 5	4,865,609
+    // 6	119,060,324
+    // 7	3,195,901,860
+    // 8	84,998,978,956
+    // 9	2,439,530,234,167
+    // 10	69,352,859,712,417
+    int depth = 6;
     int nummoves = 0;
     cout << "Depth - num" << endl;
-    for(int i = 1; i < depth; i++) {
+    for(int i = 1; i <= depth; i++) {
         nummoves =  moveGenerationTest(b, i);
         cout << i << " - " << nummoves << endl;
     }
