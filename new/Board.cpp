@@ -657,7 +657,7 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 Square* temp = getSquare(j, i);
-                if(temp->getPiece() != EMPTY && temp->getPiece() != KING) {
+                if(temp->getPiece() != EMPTY && temp->getPiece() != KING && temp->getColor() == moveColor) {
                     pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
                     vector<pair<Square*, Square*>> moves = pinnedmoves.second;
                     for(int k = 0; k < moves.size(); k++) {
@@ -1217,7 +1217,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
 
     //get all squares between pin and king and see if same color piece between so not a pin 
     bool piecebetweenpinandking = false;
-    if(in_range_bishop) {
+    if(in_range_bishop && pin->getColor() == moveColor) {
         int pintokingx = pinx-kingx; //3-6=-3
         int pintokingy = piny-kingy; //3-0=3
         for(int i = 1; i < abs(pintokingx); i++) {
@@ -1231,7 +1231,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
             }
         }
     }
-    if(in_range_rook) {
+    if(in_range_rook && pin->getColor() == moveColor) {
         int pintokingx = pinx-kingx; //3-6=-3
         int pintokingy = piny-kingy; //3-0=3
         bool negx = pintokingx < 0;
@@ -1250,8 +1250,8 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
                 int testx=(negx) ? kingx-i: kingx+i;
                 Square* temp = getSquare(testx, kingy);
                 if(temp->getPiece() != EMPTY) {
-                piecebetweenpinandking = true;
-            }
+                    piecebetweenpinandking = true;
+                }
             }
         }
     }
@@ -1283,13 +1283,11 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
     vector<pair<Square*, Square*>> legalmoves;
     pair<bool, vector<pair<Square*, Square*>>> returnthis;
     if(p == EMPTY || c == NONE) {
-        //coutTab(2);
-        //cout << "empty piece" << endl;
-        returnthis = make_pair(false, legalmoves);
+        return make_pair(false, legalmoves);
     } 
     if(c == moveColor && attackers.size() != 0) {
         Square* king = getKing(moveColor);
-
+        vector<pair<bool, Square*>> possiblePins;
         for(int i = 0; i < attackers.size(); i++) {
             pair<int, int> temp = attackers[i];
             int tempx = temp.first;
@@ -1297,11 +1295,13 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
             Square* att = getSquare(tempx, tempy);
             
             pair<bool, Square*> data = isBetweenKingandAttacker(king, att, s);
+            possiblePins.push_back(data);
+        }
 
-            if(data.first == true) {
-                //coutTab(2);
-                //cout << "attackers, is protecting king" << endl;
-                Square* att = data.second;
+        for(int i = 0; i < possiblePins.size(); i++) {
+            pair<bool, Square*> testPin = possiblePins[i];
+            if(testPin.first == true) {
+                Square* att = testPin.second;
                 //get all moves for square* s
                 vector<pair<Square*, Square*>> piecemoves = getPieceMoves(s);//get all moves for square s
                 for(int i = 0; i < piecemoves.size(); i++) {//test in all position if endmove for square s is between king and attacker
@@ -1311,19 +1311,17 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
                         legalmoves.push_back(piecemoves[i]);
                     }
                 }
-                returnthis = make_pair(true, legalmoves);
-            } else {
-                //coutTab(2);
-                //cout << "attackers, but not protecting king" << endl;
-                legalmoves = getPieceMoves(s);
-                returnthis = make_pair(false, legalmoves);
+                return make_pair(true, legalmoves);
             }
         }
-    } else if(c == moveColor && attackers.size() == 0) {
-        //coutTab(2);
-        //cout << "no attackers" << endl;
+
         legalmoves = getPieceMoves(s);
-        returnthis = make_pair(false, legalmoves);
+        return make_pair(false, legalmoves);
+
+
+    } else if(c == moveColor && attackers.size() == 0) {
+        legalmoves = getPieceMoves(s);
+        return make_pair(false, legalmoves);
     }
     //coutTab(2);
     //cout << "returnthis: " << returnthis.first << ", " << returnthis.second.size() << endl;
