@@ -2012,6 +2012,9 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
     }
     string endsquare = notationToString(end);
     string promoPiece = promotion ? "="+pieceToChess(endp) : "";
+    if(promotion) {
+        endsquare.pop_back();
+    }
     string check = "";
     if(isCheckmate()) {
         check = "#";

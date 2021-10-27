@@ -64,13 +64,11 @@ int main() {
     // cout << b.makeMove(g4, f3) << endl;//shouldnt make move
     // b.print();
 
-    // string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
-    // b.loadFEN(promotest);
-    // b.print();
-    // vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
-    // for(int i = 0; i < notmoves.size(); i++) {
-    //     cout << notmoves[i].first << notmoves[i].second << endl;
-    // }
+    string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
+    Board b(promotest);
+    b.print();
+    b.makeMoveAndPrint(b7, c8Q);
+    cout << b.getPGN() << endl;
 
     // string testfen = "rnbq1rk1/pp2ppbp/2p2np1/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7";
     // b.loadFEN(testfen);
@@ -177,13 +175,22 @@ int main() {
     // for(int i = 0; i < notmoves.size(); i++) {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
-    string testmate = "rnbqkbnr/ppppp2p/8/5ppQ/2P5/4P3/PP1P1PPP/RNB1KBNR b KQkq - 1 3";
-    Board b(testmate);
-    b.print();
-    vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
-    cout << notmoves.size() << endl;
-    for(int i = 0; i < notmoves.size(); i++) {
-        cout << notmoves[i].first << notmoves[i].second << endl;
-    }
+    // string testmate = "rnbqkbnr/ppppp2p/8/5ppQ/2P5/4P3/PP1P1PPP/RNB1KBNR b KQkq - 1 3";
+    // Board b(testmate);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    // string impMove5 = "2qk1bnr/r1pbnp1p/p1pp2p1/8/4P2P/P1NN1P2/1PPP2P1/1RBQK2R b K - 2 12";
+    // Board b(impMove5);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
     return 0;
 }
