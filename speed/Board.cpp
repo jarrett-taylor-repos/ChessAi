@@ -36,6 +36,7 @@ class Board {
 
         Color getMoveColor();
         vector<pair<Notation, Notation>> getAllMovesVector();
+        vector<pair<Notation, Notation>> returnNotationMoves();
         unordered_map<string, int> getfenMap();
         void setfenMap(); 
         int getFenRepeat();
@@ -362,6 +363,9 @@ vector<pair<Notation, Notation>> Board::getAllMovesVector() {
         }
     }
     return moves;
+}
+vector<pair<Notation, Notation>> Board::returnNotationMoves() {
+    return vectorGetNotationMoves;
 }
 
 unordered_map<string, int> Board::getfenMap() {
