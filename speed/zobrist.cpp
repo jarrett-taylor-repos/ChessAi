@@ -65,7 +65,7 @@ int Square2Int(Square* sqr){
 
 zstuff board2zvals(Board b,array<array<array<long long int,12>,8>,9> zarray){
     long long int zval = 0;
-    long long int materialadv = 0;
+    int materialadv = 0;
     array<int,12> materialevals = {1,3,3,5,9,36,-1,-3,-3,-5,-9,-36};
     
     for (int i=0; i<8; i++){
@@ -87,12 +87,11 @@ zstuff board2zvals(Board b,array<array<array<long long int,12>,8>,9> zarray){
 
     //TODO: Cating rights and shit
 
-    return zstuff(zval,materialadv,b);
+    return zstuff(zval,materialadv);
 }
 
 
-zstuff zmove(Notation first,Notation second,zstuff zobriststuff,array<array<array<long long int,12>,8>,9> zarray){
-    Board b = zobriststuff.b;
+zstuff zmove(Board &b,Notation first,Notation second,zstuff zobriststuff,array<array<array<long long int,12>,8>,9> zarray){
     int materialadv = zobriststuff.materialadv;
     long long int zval = zobriststuff.zval;
     array<int,12> materialevals = {1,3,3,5,9,36,-1,-3,-3,-5,-9,-36};
@@ -158,7 +157,7 @@ zstuff zmove(Notation first,Notation second,zstuff zobriststuff,array<array<arra
 
     zval = zval^zarray[8][0][0];
 
-    return zstuff(zval,materialadv,b);
+    return zstuff(zval,materialadv);
 
 }
 
