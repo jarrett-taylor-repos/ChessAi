@@ -89,7 +89,7 @@ int evaluate(Board b, int alpha, int beta) {
         if (winner==NONE){
             return 0;
         }
-        return 1000000;
+        return -1000000;
     }
 
     if (turn == WHITE){
