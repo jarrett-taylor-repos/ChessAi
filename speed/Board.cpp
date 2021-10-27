@@ -706,6 +706,7 @@ bool Board::makeMove(Notation start, Notation end) {
             pawnmove=true;
             if(sqend->getPiece() != EMPTY) {
                 capture = true;
+                removeSquareFromVector(getSquare(end));
             }
             Piece promoPiece = getPawnPromotion(end);
             endp = promoPiece;

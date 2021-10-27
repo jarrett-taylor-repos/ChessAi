@@ -24,9 +24,9 @@ int moveGenerationTest(Board b, int depth) {
 
 
 int main() {
-    Board b;
+    //Board b;
     string testPos = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-    //b.loadFEN(testPos);
+    Board b(testPos);
     // 1 - 44
     // 2 - 1486
     // 3 - 62379
@@ -43,7 +43,7 @@ int main() {
     // 8	84,998,978,956
     // 9	2,439,530,234,167
     // 10	69,352,859,712,417
-    int depth = 4;
+    int depth =3;
     int nummoves = 0;
     clock_t tStart = clock();
     cout << "Depth - num" << endl;
