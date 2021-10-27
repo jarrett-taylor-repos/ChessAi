@@ -288,12 +288,16 @@ void Board::addPieceToVector(Square*s) {
 bool Board::removeSquareFromVector(Square*s) {
     for(int i = 0; i < allPieces.size(); i++) {
         Square* curr = allPieces[i];
+        Piece currp = curr->getPiece();
+        Color currc = curr->getColor();
         int currx = curr->getx();
         int curry = curr->gety();
 
+        Piece sp = s->getPiece();
+        Color sc = s->getColor();
         int sx = s->getx();
         int sy = s->gety();
-        bool equal = currx == sx && curry == sy;
+        bool equal = currx == sx && curry == sy && currp == sp && currc == sc;
         if(equal) {
             allPieces.erase(allPieces.begin()+i);
             return true;
@@ -645,10 +649,10 @@ bool Board::makeMove(Notation start, Notation end) {
                     d1sqaure->setPieceandColor(ROOK, WHITE);
                     allPieces.push_back(getSquare(end));
                     allPieces.push_back(getSquare(d1));
-                    sqstart->setEmpty();
-                    a1sqaure->setEmpty();
                     removeSquareFromVector(getSquare(start));
                     removeSquareFromVector(getSquare(a1));
+                    sqstart->setEmpty();
+                    a1sqaure->setEmpty();
                 } else {
                     Square* f1sqaure = getSquare(f1);
                     Square* h1sqaure = getSquare(h1);
@@ -656,10 +660,10 @@ bool Board::makeMove(Notation start, Notation end) {
                     f1sqaure->setPieceandColor(ROOK, WHITE);
                     allPieces.push_back(getSquare(end));
                     allPieces.push_back(getSquare(f1));
-                    sqstart->setEmpty();
-                    h1sqaure->setEmpty();
                     removeSquareFromVector(getSquare(start));
                     removeSquareFromVector(getSquare(h1));
+                    sqstart->setEmpty();
+                    h1sqaure->setEmpty();
                 }
             } else {
                 bool longcastle = end == c8;
@@ -672,10 +676,10 @@ bool Board::makeMove(Notation start, Notation end) {
                     d8sqaure->setPieceandColor(ROOK, BLACK);
                     allPieces.push_back(getSquare(end));
                     allPieces.push_back(getSquare(d8));
-                    sqstart->setEmpty();
-                    a8sqaure->setEmpty();
                     removeSquareFromVector(getSquare(start));
                     removeSquareFromVector(getSquare(a8));
+                    sqstart->setEmpty();
+                    a8sqaure->setEmpty();
                 } else {
                     Square* f8sqaure = getSquare(f8);
                     Square* h8sqaure = getSquare(h8);
@@ -683,10 +687,10 @@ bool Board::makeMove(Notation start, Notation end) {
                     f8sqaure->setPieceandColor(ROOK, BLACK);
                     allPieces.push_back(getSquare(end));
                     allPieces.push_back(getSquare(f8));
-                    sqstart->setEmpty();
-                    h8sqaure->setEmpty();
                     removeSquareFromVector(getSquare(start));
                     removeSquareFromVector(getSquare(h8));
+                    sqstart->setEmpty();
+                    h8sqaure->setEmpty();
                 }
             }
         } else if(enpassant) {
@@ -707,8 +711,8 @@ bool Board::makeMove(Notation start, Notation end) {
             endp = promoPiece;
             sqend->setPieceandColor(promoPiece, sqstart->getColor());
             allPieces.push_back(getSquare(end));
-            sqstart->setEmpty();
             removeSquareFromVector(getSquare(start));
+            sqstart->setEmpty();
         } else {
             if(sqstart->getPiece() == PAWN) {
                 pawnmove = true;
@@ -719,8 +723,8 @@ bool Board::makeMove(Notation start, Notation end) {
             }
             sqend->setPieceandColor(sqstart->getPiece(), sqstart->getColor());
             allPieces.push_back(getSquare(end));
-            sqstart->setEmpty();
             removeSquareFromVector(getSquare(start));
+            sqstart->setEmpty();
         }
 
         if(pawnDoubleMove) {
