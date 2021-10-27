@@ -81,7 +81,7 @@ zstuff board2zvals(Board b,array<array<array<long long int,12>,8>,9> zarray){
         }
     }
 
-    if (b.getMoveColor()==WHITE){
+    if (b.getMoveColor()==BLACK){
         zval^zarray[9][0][0];
     }
 
@@ -112,9 +112,21 @@ zstuff zmove(Notation first,Notation second,zstuff zobriststuff,array<array<arra
     }
     
     
-    b.makeMove(first,second);
+    bool movemade = b.makeMove(first,second);
     sqr = b.getSquare(second);
-    secondpiece = Square2Int(sqr); 
+    secondpiece = Square2Int(sqr);
+
+    if(b.getWasEnpassant()){
+        if (b.getMoveColor()==WHITE){
+            materialadv -= 1;
+            zval = zval^zarray[sqr->getx()][6][0];
+        }
+        else {
+            materialadv+=1;
+            zval = zval^zarray[sqr->getx()][3][6];
+        }
+    }
+
     if(b.getWasPromo()){
         if (secondpiece<6){ //white
             materialadv+=materialevals[secondpiece]-1;
@@ -129,11 +141,34 @@ zstuff zmove(Notation first,Notation second,zstuff zobriststuff,array<array<arra
         zval = zval^zarray[sqr->getx()][sqr->gety()][secondpiece];
     }
 
-    zval = zval^zarray[9][0][0];
+    if (b.getWasCastle()) {
+        if (second == g1){
+            zval = zval^zarray[7][7][3]^zarray[5][7][3];
+        }
+        else if (second == a1) {
+            zval = zval^zarray[0][7][3]^zarray[3][7][3];
+        }
+        else if (second == c8) {
+            zval = zval^zarray[0][0][9]^zarray[3][0][9];
+        }
+        else {
+            zval = zval^zarray[7][0][9]^zarray[5][0][9];
+        }
+    }
+
+    zval = zval^zarray[8][0][0];
 
     return zstuff(zval,materialadv,b);
 
 }
 
-
+bool inside(vector<long long int> v, long long int a){
+    for (int i = 0; i<v.size();i++){
+        //cout<<v[i]<<'-'<<a<<endl;
+        if (v[i] == a){
+            return true;
+        }
+    }
+    return false;
+}
 
