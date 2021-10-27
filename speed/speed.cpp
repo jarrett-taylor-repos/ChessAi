@@ -16,7 +16,7 @@ int moveGenerationTest(Board b, int depth) {
         if(mademove) {
             numPos += moveGenerationTest(temp, depth-1);
         } else {
-            //cout << temp.getFEN() << " attempted move " << tempmove.first << tempmove.second << endl;
+            cout << temp.getFEN() << " attempted move " << tempmove.first << tempmove.second << endl;
         }
     }
     return numPos;

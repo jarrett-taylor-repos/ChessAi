@@ -715,6 +715,7 @@ bool Board::makeMove(Notation start, Notation end) {
             }
             if(sqend->getPiece() != EMPTY) {
                 capture = true;
+                removeSquareFromVector(getSquare(end));
             }
             sqend->setPieceandColor(sqstart->getPiece(), sqstart->getColor());
             allPieces.push_back(getSquare(end));

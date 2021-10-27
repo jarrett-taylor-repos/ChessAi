@@ -3,7 +3,7 @@
 
 
 int main() {
-    Board b;
+    //Board b;
     // b.makeMoveAndPrint(e2, e4);
     // b.makeMoveAndPrint(e7, e5);
     // b.makeMoveAndPrint(d1, f3);
@@ -160,14 +160,22 @@ int main() {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
 
-    string impMove4 = "rnQq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 8";
-    b.loadFEN(impMove4);
+    // string impMove4 = "rnQq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 8";
+    // Board b(impMove4);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    string vectorTest = "2rqkbnr/1bpppppp/1pn5/p7/2P1P1P1/N4P2/PP1P3P/R1BQKBNR w KQk - 3 6";
+    Board b(vectorTest);
     b.print();
-    vector<pair<Notation, Notation>> notmoves = b.getAllMovesVector();
+    vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
     cout << notmoves.size() << endl;
     for(int i = 0; i < notmoves.size(); i++) {
         cout << notmoves[i].first << notmoves[i].second << endl;
     }
-    
     return 0;
 }
