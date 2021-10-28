@@ -861,9 +861,10 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
             if(temp->getPiece() != EMPTY && temp->getColor() != NONE && temp->getColor() == moveColor) {
                 pair<bool, vector<pair<Square*, Square*>>> pinnedmoves = isSquarePinned(temp);
                 vector<pair<Square*, Square*>> goodmoves = pinnedmoves.second;
-                for(int k = 0; k < goodmoves.size(); k++) {
-                    allmoves.push_back(goodmoves[k]);
-                }
+                allmoves.insert(allmoves.end(), goodmoves.begin(), goodmoves.end());
+                // for(int k = 0; k < goodmoves.size(); k++) {
+                //     allmoves.push_back(goodmoves[k]);
+                // }
             }
         }
     }
@@ -1326,13 +1327,20 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
 
 Square* Board::getKing(Color c) {
     Square* king;
-    for(int i = 0; i < 8; i++) {
-        for(int j = 0; j < 8; j++) {
-            Square* temp = getSquare(i, j);
-            if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
-                king = temp;
-                break;
-            }
+    // for(int i = 0; i < 8; i++) {
+    //     for(int j = 0; j < 8; j++) {
+    //         Square* temp = getSquare(i, j);
+    //         if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
+    //             king = temp;
+    //             break;
+    //         }
+    //     }
+    // }
+    for(int i = 0; i < allPieces.size(); i++) {
+        Square* temp = allPieces[i];
+        if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
+            king = temp;
+            break;
         }
     }
     return king;
@@ -1418,8 +1426,6 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
 }
 
 pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
-    //coutTab(2);
-    //cout << "isSquarePinned()" << endl;
     Piece p = s->getPiece();
     Color c = s->getColor();
     vector<pair<int, int>> attackers = isSquareAttack(s);
@@ -1439,6 +1445,9 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
             
             pair<bool, Square*> data = isBetweenKingandAttacker(king, att, s);
             possiblePins.push_back(data);
+            if(data.first == true) {
+                break;
+            }
         }
 
         for(int i = 0; i < possiblePins.size(); i++) {
@@ -1844,8 +1853,6 @@ vector<pair<int,int>> Board::isKingAttacker(Square*square) {
     return attackers;
 }
 vector<pair<int,int>> Board::isSquareAttack(Square*s) {
-    //coutTab(5);
-    //cout << "isSquareAttack()" << endl;
     vector<pair<int,int>> bishops = isBishopAttacker(s);
     vector<pair<int,int>> rooks = isRookAttacker(s);
     vector<pair<int,int>> knights = isKnightAttacker(s);
@@ -1853,33 +1860,37 @@ vector<pair<int,int>> Board::isSquareAttack(Square*s) {
     vector<pair<int,int>> kings = isKingAttacker(s);
     
     vector<pair<int,int>> all;
-    for(int i = 0; i < bishops.size(); i++) {
-        if(isInRange(bishops[i].first, bishops[i].second)) {
-            all.push_back(bishops[i]);
-        }
-    }
-    for(int i = 0; i < rooks.size(); i++) {
-        if(isInRange(rooks[i].first, rooks[i].second)) {
-            all.push_back(rooks[i]);
-        }
-    }
-    for(int i = 0; i < knights.size(); i++) {
-        if(isInRange(knights[i].first, knights[i].second)) {
-            all.push_back(knights[i]);
-        }
-    }
-    for(int i = 0; i < pawns.size(); i++) {
-        if(isInRange(pawns[i].first, pawns[i].second)) {
-            all.push_back(pawns[i]);
-        }
-    }
-    for(int i = 0; i < kings.size(); i++) {
-        if(isInRange(kings[i].first, kings[i].second)) {
-            all.push_back(kings[i]);
-        }
-    }
-    //coutTab(5);
-    //cout << "attackers size: "<< all.size() << endl;
+    // for(int i = 0; i < bishops.size(); i++) {
+    //     if(isInRange(bishops[i].first, bishops[i].second)) {
+    //         all.push_back(bishops[i]);
+    //     }
+    // }
+    // for(int i = 0; i < rooks.size(); i++) {
+    //     if(isInRange(rooks[i].first, rooks[i].second)) {
+    //         all.push_back(rooks[i]);
+    //     }
+    // }
+    // for(int i = 0; i < knights.size(); i++) {
+    //     if(isInRange(knights[i].first, knights[i].second)) {
+    //         all.push_back(knights[i]);
+    //     }
+    // }
+    // for(int i = 0; i < pawns.size(); i++) {
+    //     if(isInRange(pawns[i].first, pawns[i].second)) {
+    //         all.push_back(pawns[i]);
+    //     }
+    // }
+    // for(int i = 0; i < kings.size(); i++) {
+    //     if(isInRange(kings[i].first, kings[i].second)) {
+    //         all.push_back(kings[i]);
+    //     }
+    // }
+
+    all.insert(all.end(), bishops.begin(), bishops.end());
+    all.insert(all.end(), rooks.begin(), rooks.end());
+    all.insert(all.end(), knights.begin(), knights.end());
+    all.insert(all.end(), pawns.begin(), pawns.end());
+    all.insert(all.end(), kings.begin(), kings.end());
     return all;
 }
 

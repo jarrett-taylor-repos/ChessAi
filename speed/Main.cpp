@@ -64,11 +64,11 @@ int main() {
     // cout << b.makeMove(g4, f3) << endl;//shouldnt make move
     // b.print();
 
-    string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
-    Board b(promotest);
-    b.print();
-    b.makeMoveAndPrint(b7, c8Q);
-    cout << b.getPGN() << endl;
+    // string promotest = "1nbqkbnr/rPpppppp/8/P7/8/2R5/2PPPPPP/1NBQKBNR w Kk - 1 13";
+    // Board b(promotest);
+    // b.print();
+    // b.makeMoveAndPrint(b7, c8Q);
+    // cout << b.getPGN() << endl;
 
     // string testfen = "rnbq1rk1/pp2ppbp/2p2np1/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7";
     // b.loadFEN(testfen);
@@ -192,5 +192,23 @@ int main() {
     // for(int i = 0; i < notmoves.size(); i++) {
     //     cout << notmoves[i].first << notmoves[i].second << endl;
     // }
+
+    // string samtest = "8/3P1b2/1R3r2/3k3p/7P/2K1N3/1R3np1/8 b - - 4 72";
+    // Board b(samtest);
+    // b.print();
+    // vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    // cout << notmoves.size() << endl;
+    // for(int i = 0; i < notmoves.size(); i++) {
+    //     cout << notmoves[i].first << notmoves[i].second << endl;
+    // }
+
+    string samtest2 = "3rnk1r/2b2b2/4Pn2/1P5p/P2q1pPP/R2Q4/2R5/3K4 w - - 0 45";
+    Board b(samtest2);
+    b.print();
+    vector<pair<Notation, Notation>> notmoves = b.returnNotationMoves();
+    cout << notmoves.size() << endl;
+    for(int i = 0; i < notmoves.size(); i++) {
+        cout << notmoves[i].first << notmoves[i].second << endl;
+    }
     return 0;
 }
