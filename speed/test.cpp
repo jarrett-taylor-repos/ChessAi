@@ -184,7 +184,7 @@ pair<Notation, Notation> rootsearch(Board b,vector<long long int> movestack,arra
         ofstream info;
         info.open("info.txt");
         info<<"FEN:"<<b2.getFEN()<<endl<<"zval:"<<zobriststuff.zval<<endl<<"materialadv:"<<zobriststuff.materialadv<<endl;
-        for (int j= 0; j<b.returnNotationMoves().size();j++) {info<<b.returnNotationMoves()[i].first,info<<b.returnNotationMoves()[i].second<<endl;}
+        //for (int j= 0; j<b.returnNotationMoves().size();j++) {info<<b.returnNotationMoves()[i].first,info<<b.returnNotationMoves()[i].second<<endl;}
         info.close();
         
         
@@ -193,7 +193,7 @@ pair<Notation, Notation> rootsearch(Board b,vector<long long int> movestack,arra
             //make move
             movestack.push_back(zobriststuff.zval);
             
-            int score = -alphaBeta(b2,-beta,-alpha,1,movestack,zarray,zobriststuff);
+            int score = -alphaBeta(b2,-beta,-alpha,2,movestack,zarray,zobriststuff);
             if (score>alpha) {
                 alpha = score;
                 bestmove = make_pair(n1,n2); //

@@ -65,8 +65,7 @@ pair<Notation, Notation> findbookmove(Board b){
     for(int i = 0; i < allmoves.size(); i++) {
         Notation n1 = allmoves[i].first;
         Notation n2 = allmoves[i].second;
-        Board b2;
-        b2.loadFEN(b.getFEN());
+        Board b2=b;
         b2.makeMove(n1,n2);
         string b2FEN = b2.getFEN();
         vector<string> fen_info = split(b2FEN, " ");
