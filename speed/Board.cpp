@@ -595,7 +595,7 @@ bool Board::makeMove(Notation start, Notation end) {
         move_made = false;
     }
     bool legalmove = false;
-    vector<bool> ambiguity_rowcol = {false, false};
+    vector<bool> ambiguity_rowcol_sameEndSquare = {false, false, false};
     for(int i = 0; i < vectorGetAllLegalMoves.size(); i++) {
         Square* teststart = vectorGetAllLegalMoves[i].first;
         Square* testend = vectorGetAllLegalMoves[i].second;
@@ -612,11 +612,17 @@ bool Board::makeMove(Notation start, Notation end) {
         bool test2PiecesColumn = teststart->getPiece() == sqstart->getPiece() //same piece
             && testxend && testyend //test same end sqaure
             && testxstart && !testystart; //test if in same column but diffent row
+        bool sameEndSquare = teststart->getPiece() == sqstart->getPiece() && sqstart->getPiece() == KNIGHT && testxend && testyend &&
+            !testxstart && !testystart;//test if 2 different knights can move to same square and not same piece
+
         if(test2PiecesRow) {
-            ambiguity_rowcol[0] = true;
+            ambiguity_rowcol_sameEndSquare[0] = true;
         }
         if(test2PiecesColumn) {
-            ambiguity_rowcol[1] = true;
+            ambiguity_rowcol_sameEndSquare[1] = true;
+        }
+        if(sameEndSquare) {
+            ambiguity_rowcol_sameEndSquare[2] = true;
         }
     }
 
@@ -766,7 +772,7 @@ bool Board::makeMove(Notation start, Notation end) {
     if(move_made) {
         vectorGetAllLegalMoves = getAllMoves();
         vectorGetNotationMoves = getAllMovesVector();
-        string currmovetochess = moveToChess(start, end, wasCapture, wasPromo, wasCastle, startp, endp, ambiguity_rowcol);
+        string currmovetochess = moveToChess(start, end, wasCapture, wasPromo, wasCastle, startp, endp, ambiguity_rowcol_sameEndSquare);
         updatePGN(currmovetochess);
     }
     return move_made;
@@ -935,7 +941,7 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
             int endx = end->getx();
             int endy = end->gety();
         
-            if(pairatt.size() == 1) { 
+            if(pairatt.size() > 0) { 
                 int pairattx = pairatt[0].first;
                 int pairatty = pairatt[0].second;
                 Square* att = getSquare(pairattx, pairatty);
@@ -2119,11 +2125,16 @@ string Board::moveToChess(Notation start, Notation end, bool capture, bool promo
     }
 
     string ambiguity = "";
-    if(rowcol[0] && startp != PAWN) {//same row state file
+    if(rowcol[2] && !rowcol[1] && !rowcol[0] && startp == KNIGHT) {
         string temp = notationToString(start);
         ambiguity = temp[0];
-    }
-    if(rowcol[1] && startp != PAWN) {//same column state rank
+    } else if (rowcol[2] && rowcol[1] && !rowcol[0] && startp == KNIGHT) {
+        string temp = notationToString(start);
+        ambiguity = temp[1];
+    } else if (!rowcol[2] && rowcol[0] && startp != PAWN) {//same row state file
+        string temp = notationToString(start);
+        ambiguity = temp[0];
+    } else if(!rowcol[2] && rowcol[1] && startp != PAWN) {//same column state rank
         string temp = notationToString(start);
         ambiguity = temp[1];
     }

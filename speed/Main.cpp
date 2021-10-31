@@ -169,13 +169,16 @@ int main() {
     // string testFailedPos2_thinksKnightIsBishop2 = "rnbqkb1r/pppppppp/8/8/5Pn1/8/PPPPPKPP/RNBQ1BNR w kq - 3 3";
     // testBoardPos(testFailedPos2_thinksKnightIsBishop2);
 
-    string testFailedPos2_tooManyMoves = "rnbqkbnr/2pppppp/pP6/8/8/8/1PPPPPPP/RNBQKBNR b KQkq - 0 3";
-    testBoardPos(testFailedPos2_tooManyMoves);
+    // string testFailedPos2_tooManyMoves = "rnbqkbnr/2pppppp/pP6/8/8/8/1PPPPPPP/RNBQKBNR b KQkq - 0 3";
+    // testBoardPos(testFailedPos2_tooManyMoves);
 
-    string testFailedPos_tooManyMoves2 = "rnbqkbnr/p1pp1ppp/1P6/4p3/8/8/PP1PPPPP/RNBQKBNR b KQkq - 0 3";
-    testBoardPos(testFailedPos_tooManyMoves2);
+    // string testFailedPos_tooManyMoves2 = "rnbqkbnr/p1pp1ppp/1P6/4p3/8/8/PP1PPPPP/RNBQKBNR b KQkq - 0 3";
+    // testBoardPos(testFailedPos_tooManyMoves2);
 
-    string testFailedPos_tooManyMoves3 = "rnbqkbnr/pppp1p1p/6P1/4p3/8/8/PPPPP1PP/RNBQKBNR b KQkq - 0 3";
-    testBoardPos(testFailedPos_tooManyMoves3);
+    // string testFailedPos_tooManyMoves3 = "rnbqkbnr/pppp1p1p/6P1/4p3/8/8/PPPPP1PP/RNBQKBNR b KQkq - 0 3";
+    // testBoardPos(testFailedPos_tooManyMoves3);
+
+    string doublechecktest = "1q3Nnr/r2kp1p1/6Q1/np1P1B1p/5P2/1P4P1/3P3P/1RB1K1NR b K - 0 23";
+    testBoardPos(doublechecktest);
     return 0;
 }
