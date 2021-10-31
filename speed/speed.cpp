@@ -47,7 +47,7 @@ int main() {
     // 10	69,352,859,712,417
     ofstream myfile;
     myfile.open("chessPositions.txt");
-    int depth = 4;
+    int depth = 5;
     int nummoves = 0;
     clock_t tStart = clock();
     cout << "Depth - num" << endl;
