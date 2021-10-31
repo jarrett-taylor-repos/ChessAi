@@ -772,9 +772,6 @@ bool Board::makeMove(Notation start, Notation end) {
     return move_made;
 }
 
-void Board::removeMove() {
-
-}
 
 Piece Board::getPawnPromotion(Notation n){
     string str = notationToString(n);
@@ -814,8 +811,6 @@ vector<pair<Square*, Square*>> Board::getAllMoves() {
     //can get all moves and then test all those moves return and see if they are legal from there
     //need to see if in check
     vector<pair<int, int>> checks = isInCheck();
-    //coutTab(1);
-    //cout << "getallmoves()" << endl;
     vector<pair<Square*, Square*>> allmoves;
     if(checks.size() == 2) { //if in double check return all possible king moves
         Square* king = getKing(moveColor);
@@ -897,8 +892,6 @@ vector<pair<Square*, Square*>> Board::getPieceMoves(Square*sq){
     return temp;
 }
 vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
-    //coutTab(4);
-    //cout << "kingmove()" << endl;
     vector<pair<Square*, Square*>> kings;
     int x = sq->getx();
     int y = sq->gety();
@@ -942,7 +935,7 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
             int endx = end->getx();
             int endy = end->gety();
         
-            if(pairatt.size() == 1) {
+            if(pairatt.size() == 1) { 
                 int pairattx = pairatt[0].first;
                 int pairatty = pairatt[0].second;
                 Square* att = getSquare(pairattx, pairatty);
@@ -950,16 +943,16 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
                 bool goody = att->gety() == pairatty;
                 vector<pair<int, int>> testend = isSquareAttack(end);
                 bool notFutureCheck = testend.size() == 0;
-                bool rooktoleft = (pairattx < x) && (pairatty == y) && endy == pairatty && endx > x;
-                bool rooktoright = (pairattx > x) && (pairatty == y) && endy == pairatty && endx < x;
-                bool rooktoup = (pairattx == x) && (pairatty > y) && endx == pairattx && endy < y;
-                bool rooktodown = (pairattx == x) && (pairatty < y) && endx == pairattx && endy > y;
+                bool rooktoleft = (pairattx < x) && (pairatty == y) && endy == pairatty && endx > x && (att->getPiece() == QUEEN || att->getPiece() == ROOK);
+                bool rooktoright = (pairattx > x) && (pairatty == y) && endy == pairatty && endx < x && (att->getPiece() == QUEEN || att->getPiece() == ROOK);
+                bool rooktoup = (pairattx == x) && (pairatty > y) && endx == pairattx && endy < y && (att->getPiece() == QUEEN || att->getPiece() == ROOK);
+                bool rooktodown = (pairattx == x) && (pairatty < y) && endx == pairattx && endy > y && (att->getPiece() == QUEEN || att->getPiece() == ROOK);
 
                 //add BISHOP logic
-                bool bishopupleft = (pairattx < x) && (pairatty < y) && endx > x && endy > y;
-                bool bishopupright = (pairattx > x) && (pairatty < y) && endx < x && endy > y;
-                bool bishopdownleft = (pairattx < x) && (pairatty > y) && endx > x && endy < y;
-                bool bishopdownright = (pairattx > x) && (pairatty > y) && endx < x && endy < y;
+                bool bishopupleft = (pairattx < x) && (pairatty < y) && endx > x && endy > y && (att->getPiece() == QUEEN || att->getPiece() == BISHOP);
+                bool bishopupright = (pairattx > x) && (pairatty < y) && endx < x && endy > y && (att->getPiece() == QUEEN || att->getPiece() == BISHOP);
+                bool bishopdownleft = (pairattx < x) && (pairatty > y) && endx > x && endy < y && (att->getPiece() == QUEEN || att->getPiece() == BISHOP);
+                bool bishopdownright = (pairattx > x) && (pairatty > y) && endx < x && endy < y && (att->getPiece() == QUEEN || att->getPiece() == BISHOP);
                 
                 bool noBishopAtt = !bishopupleft && !bishopupright && !bishopdownleft && !bishopdownright;
                 bool noRookAtt = !rooktoleft && !rooktoright && !rooktoup && !rooktodown;
@@ -976,24 +969,14 @@ vector<pair<Square*, Square*>> Board::KingMoves(Square*sq){
             }
         }
     }
-    //coutTab(4);
-    //cout << "num king moves: " << kings.size() << endl;
     return kings;
 }
 vector<pair<Square*, Square*>> Board::QueenMoves(Square*sq){
-    //coutTab(4);
-    //cout << "queenmove()" << endl;
     vector<pair<Square*, Square*>> queens;
     vector<pair<Square*, Square*>> bishops = BishopMoves(sq);
     vector<pair<Square*, Square*>> rooks = RookMoves(sq);
-    for(int i = 0; i < bishops.size(); i++) {
-        queens.push_back(bishops[i]);
-    }
-    for(int i = 0; i < rooks.size(); i++) {
-        queens.push_back(rooks[i]);
-    }
-    //coutTab(4);
-    //cout << "num queen moves: " << queens.size() << endl;
+    queens.insert(queens.end(), bishops.begin(), bishops.end());
+    queens.insert(queens.end(), rooks.begin(), rooks.end());
     return queens;
 }
 vector<pair<Square*, Square*>> Board::RookMoves(Square*start){
@@ -1065,8 +1048,6 @@ vector<pair<Square*, Square*>> Board::RookMoves(Square*start){
     return rookmoves;
 }
 vector<pair<Square*, Square*>> Board::BishopMoves(Square*start){
-    //coutTab(4);
-    //cout << "bishopmove()" << endl;
     vector<pair<Square*, Square*>> diags;
     int x = start->getx();
     int y = start->gety();
@@ -1147,13 +1128,9 @@ vector<pair<Square*, Square*>> Board::BishopMoves(Square*start){
         Square* end = getSquare(temppair.first, temppair.second);
         diags.push_back(make_pair(start, end));
     }
-    //coutTab(4);
-    //cout << "num bishop moves: " << diags.size() << endl;
     return diags;
 }
 vector<pair<Square*, Square*>> Board::KnightMoves(Square*sq){
-    //coutTab(4);
-    //cout << "knightmove()" << endl;
     vector<pair<Square*, Square*>> knights;
     int x = sq->getx();
     int y = sq->gety();
@@ -1175,13 +1152,9 @@ vector<pair<Square*, Square*>> Board::KnightMoves(Square*sq){
             knights.push_back(make_pair(sq, end));
         }
     }
-    //coutTab(4);
-    //cout << "num knights moves: " << knights.size() << endl;
     return knights;
 }
 vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
-    //coutTab(4);
-    //cout << "pawnmove()" << endl;
     vector<pair<Square*, Square*>> pawns;
     int x = pawn->getx();
     int y = pawn->gety();
@@ -1230,24 +1203,88 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
             bool goodx = abs(enpassantSquare_x-x) == 1;
             bool goody = enpassantSquare_y-y == -1;
 
-            Square* king = getKing(BLACK);
-            Square* attacked;
-            if(abs(x-king->getx()) > abs(enpassantSquare_x-king->getx())) {
-                attacked = pawn;
-            } else {
-                attacked = enpassantSquare;
-            }
-            bool rookIsPinningPawn = false;
-            vector<pair<int, int>> rooksAttackers = isRookAttacker(attacked);
-            for(int i = 0; i < rooksAttackers.size(); i++) {
-                pair<int, int> temp = rooksAttackers[i];
-                if(temp.second == 3) {
-                    rookIsPinningPawn = true;
-                }
-            }
-            bool notpinned = king->gety()==3 && rookIsPinningPawn;
 
-            if(goodx && goody && notpinned) {
+            bool pinned = true;
+            Square* king = getKing(WHITE);
+            int kingx = king->getx();
+            int kingy = king->gety();
+            Square* attacked;
+            if(kingy == 3) {
+                bool pinned = true;
+                vector<Square*> rooks;
+                for(int i = 0; i < 8; i++) {
+                    Square* testrook = getSquare(i, 3);
+                    if((testrook->getPiece()==ROOK || testrook->getPiece() == QUEEN ) && testrook->getColor() != moveColor) {
+                        rooks.push_back(testrook);
+                    }
+                }
+
+                Square* attackingrook;
+                for(int i = 0; i < rooks.size(); i++) {
+                    int rookx = rooks[i]->getx();
+                    if(rookx > kingx) {
+                        for(int j = rookx-1; j > kingx; j--) {
+                            Square* testpiece = getSquare(j, 3);
+                            int testpiecex = testpiece->getx();//should be j
+                            bool isNotEnpassantPawn = j != enpassantSquare_x && j != x;
+                            if(testpiece->getPiece() != EMPTY && isNotEnpassantPawn) {//if not either enpassant pawn and is not empty, is not attacking so not pinned
+                                break;
+                            } else if(!isNotEnpassantPawn) { //attacks an enpassant pawn
+                                if(j == enpassantSquare_x) { //is attacking enpassant capture pawn
+                                    attacked = enpassantSquare;
+                                } else { //is attacking capturing pawn
+                                    attacked = pawn;
+                                }
+                                attackingrook = rooks[i];
+                                break;
+                            } else {
+                                //useless
+                            }
+                        }
+                    } else {
+                        for(int j = rookx+1; j < kingx; j++) {
+                            Square* testpiece = getSquare(j, 3);
+                            int testpiecex = testpiece->getx();//should be j
+                            bool isNotEnpassantPawn = j != enpassantSquare_x && j != x;
+                            if(testpiece->getPiece() != EMPTY && isNotEnpassantPawn) {//if not either enpassant pawn and is not empty, is not attacking so not pinned
+                                break;
+                            } else if(!isNotEnpassantPawn) { //attacks an enpassant pawn
+                                if(j == enpassantSquare_x) { //is attacking enpassant capture pawn
+                                    attacked = enpassantSquare;
+                                } else { //is attacking capturing pawn
+                                    attacked = pawn;
+                                }
+                                attackingrook = rooks[i];
+                                break;
+                            } else {
+                                //useless
+                            }
+                        }
+                    }
+                }
+                int attrookx = attackingrook->getx();
+                int attacked_x = attacked->getx();
+
+                if(attrookx > attacked_x) {
+                    for(int i = attacked_x-2; i > kingx; i--) {
+                        Square* testempty = getSquare(i, 3);
+                        if(testempty->getPiece() != EMPTY) {
+                            pinned = false;
+                        }
+                    }
+                } else {
+                    for(int i = attacked_x+2; i<kingx; i++) {
+                        Square* testempty = getSquare(i, 3);
+                        if(testempty->getPiece() != EMPTY) {
+                            pinned = false;
+                        }
+                    }
+                }
+
+                if(goodx && goody && !pinned) {
+                    pawns.push_back(make_pair(pawn, enpassantSquare));
+                }
+            } else if (goodx && goody) {
                 pawns.push_back(make_pair(pawn, enpassantSquare));
             }
         }
@@ -1292,50 +1329,97 @@ vector<pair<Square*, Square*>> Board::PawnMoves(Square*pawn){
             bool goody = enpassantSquare_y-y == 1;
 
             Square* king = getKing(BLACK);
+            int kingx = king->getx();
+            int kingy = king->gety();
             Square* attacked;
-            if(abs(x-king->getx()) > abs(enpassantSquare_x-king->getx())) {
-                attacked = pawn;
-            } else {
-                attacked = enpassantSquare;
-            }
-            bool rookIsPinningPawn = false;
-            vector<pair<int, int>> rooksAttackers = isRookAttacker(attacked);
-            for(int i = 0; i < rooksAttackers.size(); i++) {
-                pair<int, int> temp = rooksAttackers[i];
-                if(temp.second == 4) {
-                    rookIsPinningPawn = true;
+            if(kingy == 4) {
+                bool pinned = true;
+                vector<Square*> rooks;
+                for(int i = 0; i < 8; i++) {
+                    Square* testrook = getSquare(i, 4);
+                    if((testrook->getPiece()==ROOK || testrook->getPiece() == QUEEN)&& testrook->getColor() != moveColor) {
+                        rooks.push_back(testrook);
+                    }
                 }
-            }
-            bool notpinned = king->gety()==4 && rookIsPinningPawn;
 
-            if(goodx && goody && notpinned) {
+                Square* attackingrook;
+                for(int i = 0; i < rooks.size(); i++) {
+                    int rookx = rooks[i]->getx();
+                    if(rookx > kingx) {
+                        for(int j = rookx-1; j > kingx; j--) {
+                            Square* testpiece = getSquare(j, 4);
+                            int testpiecex = testpiece->getx();//should be j
+                            bool isNotEnpassantPawn = j != enpassantSquare_x && j != x;
+                            if(testpiece->getPiece() != EMPTY && isNotEnpassantPawn) {//if not either enpassant pawn and is not empty, is not attacking so not pinned
+                                break;
+                            } else if(!isNotEnpassantPawn) { //attacks an enpassant pawn
+                                if(j == enpassantSquare_x) { //is attacking enpassant capture pawn
+                                    attacked = enpassantSquare;
+                                } else { //is attacking capturing pawn
+                                    attacked = pawn;
+                                }
+                                attackingrook = rooks[i];
+                                break;
+                            } else {
+                                //useless
+                            }
+                        }
+                    } else {
+                        for(int j = rookx+1; j < kingx; j++) {
+                            Square* testpiece = getSquare(j, 4);
+                            int testpiecex = testpiece->getx();//should be j
+                            bool isNotEnpassantPawn = j != enpassantSquare_x && j != x;
+                            if(testpiece->getPiece() != EMPTY && isNotEnpassantPawn) {//if not either enpassant pawn and is not empty, is not attacking so not pinned
+                                break;
+                            } else if(!isNotEnpassantPawn) { //attacks an enpassant pawn
+                                if(j == enpassantSquare_x) { //is attacking enpassant capture pawn
+                                    attacked = enpassantSquare;
+                                } else { //is attacking capturing pawn
+                                    attacked = pawn;
+                                }
+                                attackingrook = rooks[i];
+                                break;
+                            } else {
+                                //useless
+                            }
+                        }
+                    }
+                }
+                int attrookx = attackingrook->getx();
+                int attacked_x = attacked->getx();
+
+                if(attrookx > attacked_x) {
+                    for(int i = attacked_x-2; i > kingx; i--) {
+                        Square* testempty = getSquare(i, 4);
+                        if(testempty->getPiece() != EMPTY) {
+                            pinned = false;
+                        }
+                    }
+                } else {
+                    for(int i = attacked_x+2; i<kingx; i++) {
+                        Square* testempty = getSquare(i, 4);
+                        if(testempty->getPiece() != EMPTY) {
+                            pinned = false;
+                        }
+                    }
+                }
+
+                if(goodx && goody && !pinned) {
+                    pawns.push_back(make_pair(pawn, enpassantSquare));
+                }
+            } else if (goodx && goody) {
                 pawns.push_back(make_pair(pawn, enpassantSquare));
             }
         }
     }
 
 
-    // cout << "getPawns()" << endl;
-    // for(int i = 0; i < pawns.size(); i++) {
-    //     cout << pawns[i].first << ", " << pawns[i].first << endl;
-    // }
-    //coutTab(4);
-    //cout << "num pawn moves: " << pawns.size() << endl;
     return pawns;
 }
 
 
 Square* Board::getKing(Color c) {
     Square* king;
-    // for(int i = 0; i < 8; i++) {
-    //     for(int j = 0; j < 8; j++) {
-    //         Square* temp = getSquare(i, j);
-    //         if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
-    //             king = temp;
-    //             break;
-    //         }
-    //     }
-    // }
     for(int i = 0; i < allPieces.size(); i++) {
         Square* temp = allPieces[i];
         if(temp->getColor() == c && temp->getPiece() == KING && isInRange(temp->getx(), temp->gety())) {
@@ -1368,6 +1452,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
 
     //get all squares between pin and king and see if same color piece between so not a pin 
     bool piecebetweenpinandking = false;
+    vector<Square*> sqauresBetweenKingAndAttacked;
     if(in_range_bishop && pin->getColor() == moveColor) {
         int pintokingx = pinx-kingx; //3-6=-3
         int pintokingy = piny-kingy; //3-0=3
@@ -1377,9 +1462,7 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
             int testx = (negx) ? kingx-i: kingx+i;
             int testy = (negy) ? kingy-i: kingy+i;
             Square* temp = getSquare(testx, testy);
-            if(temp->getPiece() != EMPTY) {
-                piecebetweenpinandking = true;
-            }
+            sqauresBetweenKingAndAttacked.push_back(temp);
         }
     }
     if(in_range_rook && pin->getColor() == moveColor) {
@@ -1391,31 +1474,34 @@ pair<bool, Square*> Board::isBetweenKingandAttacker(Square* king, Square* attack
             for(int i = 1; i < abs(pintokingy); i++) {
                 int testy=(negy) ? kingy-i: kingy+i;
                 Square* temp = getSquare(kingx, testy);
-                if(temp->getPiece() != EMPTY) {
-                    piecebetweenpinandking = true;
-                }
+                sqauresBetweenKingAndAttacked.push_back(temp);
             }
 
         } else {//same y, check x
             for(int i = 1; i < abs(pintokingx); i++) {
                 int testx=(negx) ? kingx-i: kingx+i;
                 Square* temp = getSquare(testx, kingy);
-                if(temp->getPiece() != EMPTY) {
-                    piecebetweenpinandking = true;
-                }
+                sqauresBetweenKingAndAttacked.push_back(temp);
             }
         }
     }
+    int numOfNonEmptyPieces = 0;
+    for(int i = 0; i < sqauresBetweenKingAndAttacked.size(); i++) {
+        Square* testsq = sqauresBetweenKingAndAttacked[i];
+        if(testsq->getPiece() != EMPTY) {
+            numOfNonEmptyPieces++;
+        }
+    }
+    piecebetweenpinandking = numOfNonEmptyPieces == 0;
+
 
     //test if attacker on pin is actually pinned by 
-    bool is_bishop_pinning = in_range_bishop && !piecebetweenpinandking &&
-        (king_to_attaker_x == king_to_attaker_y) && 
-        (king_to_attaker_x > 1 && king_to_attaker_x > 1) &&
+    bool is_bishop_pinning = in_range_bishop && piecebetweenpinandking &&
+        ((king_to_attaker_x == king_to_attaker_y) && (king_to_attaker_x > 1 && king_to_attaker_x > 1)) &&
         (attacker->getPiece() == QUEEN || attacker->getPiece() == BISHOP); 
 
-    bool is_rook_pinning = in_range_rook && !piecebetweenpinandking &&
-        (king_to_attaker_x == 0 && king_to_attaker_y != 0) || 
-        (king_to_attaker_x != 0 && king_to_attaker_y == 0) && 
+    bool is_rook_pinning = in_range_rook && piecebetweenpinandking &&
+        ((king_to_attaker_x == 0 && king_to_attaker_y != 0) || (king_to_attaker_x != 0 && king_to_attaker_y == 0)) && 
         (attacker->getPiece() == ROOK || attacker->getPiece() == QUEEN);
 
     if(is_bishop_pinning || is_rook_pinning) {
@@ -1429,12 +1515,17 @@ pair<bool, vector<pair<Square*, Square*>>> Board::isSquarePinned(Square* s) {
     Piece p = s->getPiece();
     Color c = s->getColor();
     vector<pair<int, int>> attackers = isSquareAttack(s);
+    for(int i = 0; i < attackers.size(); i++) {
+        if(!isInRange(attackers[i].first, attackers[i].second)) {
+            attackers.erase(attackers.begin()+i);
+        }
+    }
     vector<pair<Square*, Square*>> legalmoves;
     pair<bool, vector<pair<Square*, Square*>>> returnthis;
-    if(p == EMPTY || c == NONE) {
+    if(p == EMPTY || c == NONE || c != moveColor) {
         return make_pair(false, legalmoves);
     } 
-    if(c == moveColor && attackers.size() != 0) {
+    if(attackers.size() != 0) {
         Square* king = getKing(moveColor);
         vector<pair<bool, Square*>> possiblePins;
         for(int i = 0; i < attackers.size(); i++) {
@@ -1860,31 +1951,6 @@ vector<pair<int,int>> Board::isSquareAttack(Square*s) {
     vector<pair<int,int>> kings = isKingAttacker(s);
     
     vector<pair<int,int>> all;
-    // for(int i = 0; i < bishops.size(); i++) {
-    //     if(isInRange(bishops[i].first, bishops[i].second)) {
-    //         all.push_back(bishops[i]);
-    //     }
-    // }
-    // for(int i = 0; i < rooks.size(); i++) {
-    //     if(isInRange(rooks[i].first, rooks[i].second)) {
-    //         all.push_back(rooks[i]);
-    //     }
-    // }
-    // for(int i = 0; i < knights.size(); i++) {
-    //     if(isInRange(knights[i].first, knights[i].second)) {
-    //         all.push_back(knights[i]);
-    //     }
-    // }
-    // for(int i = 0; i < pawns.size(); i++) {
-    //     if(isInRange(pawns[i].first, pawns[i].second)) {
-    //         all.push_back(pawns[i]);
-    //     }
-    // }
-    // for(int i = 0; i < kings.size(); i++) {
-    //     if(isInRange(kings[i].first, kings[i].second)) {
-    //         all.push_back(kings[i]);
-    //     }
-    // }
 
     all.insert(all.end(), bishops.begin(), bishops.end());
     all.insert(all.end(), rooks.begin(), rooks.end());
