@@ -3,7 +3,7 @@
 using namespace std::chrono;
 #include <time.h>
 
-int moveGenerationTest(Board b, int depth) {
+int moveGenerationTest(Board b, int depth, ofstream& myfile) {
     if(depth == 0) {
         return 1;
     }
@@ -13,8 +13,9 @@ int moveGenerationTest(Board b, int depth) {
         pair<Notation, Notation> tempmove = notmoves[i];
         Board temp = b;
         bool mademove = temp.makeMove(tempmove.first, tempmove.second);
+        myfile << temp.getFEN() << " NUMMOVES: " << temp.returnNotationMoves().size() << endl;
         if(mademove) {
-            numPos += moveGenerationTest(temp, depth-1);
+            numPos += moveGenerationTest(temp, depth-1, myfile);
         } else {
             cout << temp.getFEN() << " attempted move " << tempmove.first << tempmove.second << endl;
         }
@@ -25,15 +26,15 @@ int moveGenerationTest(Board b, int depth) {
 
 int main() {
     //Board b;
-    string testPos = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-    //Board b(testPos);
+    string testPos1 = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
+    Board b(testPos1);
     // 1 - 44
     // 2 - 1,486
     // 3 - 62,379
     // 4 - 2,103,487
     // 5 - 89,941,194
 
-    Board b;
+    //Board b;
     // 1	20
     // 2	400
     // 3	8,902
@@ -44,15 +45,18 @@ int main() {
     // 8	84,998,978,956
     // 9	2,439,530,234,167
     // 10	69,352,859,712,417
+    ofstream myfile;
+    myfile.open("chessPositions.txt");
     int depth = 5;
     int nummoves = 0;
     clock_t tStart = clock();
     cout << "Depth - num" << endl;
     for(int i = 1; i <= depth; i++) {
-        nummoves =  moveGenerationTest(b, i);
+        nummoves =  moveGenerationTest(b, i, myfile);
         cout << i << " - " << nummoves << endl;
         printf("Time taken: %.4fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
     
     }
+    myfile.close();
     return 0;
 }
